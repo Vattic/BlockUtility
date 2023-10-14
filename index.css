@@ -1,0 +1,326 @@
+html {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 100%;
+    color: white;
+    letter-spacing: -.022rem;
+}
+
+body {
+    margin: 0;
+    background-color: rgb(38, 38, 38);
+}
+
+input {
+    font: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+}
+
+/* header menu */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgb(60, 60, 60);
+    border-bottom: 0.1rem solid rgb(70, 70, 70);
+    overflow: auto;
+    padding: 0 1.5rem;
+}
+
+header ul {
+    list-style: none;
+}
+
+header ul li {
+    display: inline-block;
+    margin: 0.3rem 1rem 0;
+    color: inherit;
+}
+
+header a {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+/* main page */
+wrapper {
+    display: block;
+    margin: 0 auto;
+    padding: 1rem;
+    max-width: 46rem;
+}
+
+/* gradient preview */
+#gradientBox {
+    background-color: rgb(34, 34, 34);
+    border-top: .1rem solid rgb(66, 66, 66);
+    border-right: .1rem solid rgb(66, 66, 66);
+    border-left: .1rem solid rgb(66, 66, 66);
+    border-radius: .3rem .3rem 0 0;
+    overflow: auto;
+}
+
+#gradientPreview {
+    height: 3rem;
+    margin: .4rem;
+}
+
+/* color menu and basic controls */
+ul#gradientControls {
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    background-color: rgb(60, 60, 60);
+    border-right: 0.1rem solid rgb(70, 70, 70);
+    border-left: 0.1rem solid rgb(70, 70, 70);
+    margin: 0;
+    padding: 0;
+}
+
+ul#gradientControls > li {
+    display: flex;
+    margin: 0.4rem;
+}
+
+li#centerControls {
+    flex-grow: 1;
+    justify-content: space-between;
+    border-left: 0.15rem solid rgb(100, 100, 100);
+    border-right: 0.15rem solid rgb(100, 100, 100);
+    padding: 0 0.5rem;
+}
+
+#advancedControlsBox {
+    display: flex;
+    background-color: rgb(60, 60, 60);
+    border-bottom: .1rem solid rgb(70, 70, 70);
+    border-right: .1rem solid rgb(70, 70, 70);
+    border-left: .1rem solid rgb(70, 70, 70);
+    border-radius: 0 0 .3rem .3rem;
+}
+
+#moreOptions {
+    margin: 0.4rem;
+}
+
+#easePresetMenu {
+    margin-top: .4rem;
+    margin-left: .4rem;
+}
+
+#easePresetMenu > div {
+    line-height: 0;
+    padding-top: 0.2rem;
+    display: flex;
+}
+
+#easePresetMenu > div:first-child {
+    line-height: 0;
+    padding-top: 0 !important;
+}
+
+#moreOptions {
+    flex-grow: 1;
+    border-left: .15rem solid rgb(100, 100, 100);
+    padding-left: 0.9rem;
+}
+
+
+/* buttons */
+button:hover {
+    cursor: pointer;
+}
+
+#randomiseButton, #swapButton, #pathButton, #textureButtonA, #textureButtonZ {
+    background-color: transparent;
+    border: none;
+    margin: 0.1rem 0;
+    height: 1.8rem;
+}
+
+#randomiseIcon, #swapIcon, #pathIcon, .blockIcon {
+    width: 2rem;
+}
+
+#easePresetMenu button {
+    background-color: transparent;
+    border: none;
+    margin: 0;
+    padding-bottom: 0;
+    padding-left: 0.1rem;
+    padding-right: 0.1rem;
+}
+
+#easePresetMenu > div > button:first-child {
+    padding-left: 0 !important;
+}
+#easePresetMenu > div > button:last-child {
+    padding-right: 0 !important;
+}
+
+/* color picker */
+.minicolors-theme-default.minicolors {
+    /* margin: 0.3rem; */
+    display: block !important;
+}
+
+.minicolors-theme-default .minicolors-input {
+    background-color: rgb(38, 38, 38) !important;
+    border: .1rem solid rgb(66, 66, 66);
+    height: 2rem !important;
+}
+
+.minicolors-position-left > .minicolors-input {
+    padding-left: 2.5rem !important;
+    padding-right: 0.4rem !important;
+}
+
+.minicolors-position-right > .minicolors-input {
+    padding-left: 0.4rem !important;
+    padding-right: 2.5rem !important;
+    text-align: right;
+}
+
+.minicolors-theme-default .minicolors-swatch {
+    height: 1.63rem !important;
+    width: 1.63rem !important;
+    top: 0.3rem !important;
+}
+
+#textureMenuCloseButton {
+    background-color: transparent;
+    border: 0.15rem solid rgb(196, 196, 196);
+    border-radius: 20rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    position: fixed;
+    right: 1rem;
+    top: 1rem;
+}
+
+#textureMenuCloseButton:hover {
+    border: 0.15rem solid white;
+}
+
+#textureMenuCloseButton > img {
+    width: 1.5rem;
+}
+
+/* texture menu */
+.textureButton {
+    background-color: transparent;
+    border: none;
+    margin: 0;
+    padding: 0.2rem;
+}
+
+.textureIcon {
+    width: 5rem;
+    height: 5rem;
+    display: block;
+    image-rendering: pixelated;
+}
+
+#textureMenu img.textureIcon:hover {
+    box-shadow: 0 0 0 0.2rem #FFFFFF, 0 0 8px 4px #000000;
+}
+
+#textureMenu {
+    backdrop-filter: blur(3px);
+    background-color: rgba(22, 22, 22, 10%);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    display: none;
+    text-align: center;
+}
+
+#textureMenuWrapper {
+    margin: 0 auto;
+    padding: 0 2.4rem;
+    max-width: 60rem;
+    text-align: left;
+    line-height: 0;
+    padding-bottom: 5rem;
+}
+
+/* easing editor */
+#svg {
+    margin: .4rem;
+}
+
+svg {
+    border: .1rem solid rgb(66, 66, 66);
+    display: block;
+}
+
+.easingIcon {
+    width: 2rem;
+}
+
+.interactiveSVG .background {
+    fill: rgb(38, 38, 38) !important;
+}
+
+.interactiveSVG .static-line {
+    stroke: rgb(70, 70, 70) !important;
+}
+
+.interactiveSVG .handle {
+    stroke: rgb(71, 74, 243) !important;
+    stroke-width: 3 !important;
+}
+
+.interactiveSVG .controllable-line {
+    stroke: rgb(255, 255, 255) !important;
+}
+
+.interactiveSVG .draggable-point {
+    fill: rgb(71, 74, 243) !important;
+    stroke: rgb(38, 38, 38) !important;
+}
+
+.interactiveSVG .static-point {
+    fill: rgb(255, 255, 255) !important;
+}
+
+#easePresetMenu path {
+    fill: none;
+    stroke: rgb(255, 255, 255);
+    stroke-width: 2.5;
+}
+
+#easePresetMenu path.selectedPreset {
+    stroke: rgb(71, 74, 243);
+}
+
+#easePresetMenu svg {
+    background-color: rgb(34, 34, 34);
+}
+
+/* tooltip */
+#tooltip {
+    display: none;
+    position: absolute;
+    text-transform: capitalize;
+    padding: 0.1rem 0.6rem 0.3rem;	
+	background: #242135cc;	color: #fff;
+	border-radius: 0 10px 10px 10px;
+	box-shadow: 0px 1px 3px #0004;
+	font-size: 0.9rem;
+    letter-spacing: 0rem;
+	pointer-events: none;
+}
+
+/* link to source */
+#sourceLink {
+    float: right;
+    color: inherit;
+    text-decoration: inherit;
+}
+#sourceLink i {
+    margin-right: 0.3rem;
+}

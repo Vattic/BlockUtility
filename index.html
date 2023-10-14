@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<html lang="en"><head>
+    <meta charset="utf-8">
+	<link rel="stylesheet" href="index.css">
+    <script src="https://kit.fontawesome.com/b08d90ebf8.js" crossorigin="anonymous"></script>
+    <title>BlockUtility</title>
+</head><body>
+<header>
+    <h1>BlockUtility</h1>
+    <!-- <ul>
+        <li id="currentPage">GradientsA</li>
+        <li><a href="">GradientsB</a></li>
+        <li><a href="">Variations</a></li>
+        <li><a href="">Mixer</a></li>
+    </ul> -->
+</header>
+<!-- <a href="http://github" id="sourceLink">
+    <i class="fa-brands fa-github" style="color: #ffffff;"></i>Source on Github
+</a> -->
+<wrapper>
+    <div id="gradientBox">
+        <figure id="gradientPreview"></figure>
+    </div>
+
+    <ul id="gradientControls">
+        <li>
+            <button id="textureButtonA">
+                <img src="./icon/block.svg" alt="open texture menu" id="startBlockSelect" class="blockIcon"/>
+            </button>
+            <input type="text" id="colorA" class="colorSelector" autocomplete="off" spellcheck="false">    
+        </li>
+        <li id="centerControls">
+            <button id="pathButton">
+                <img src="./icon/short.svg" alt="toggle path length" id="pathIcon" />
+            </button>
+            <button id="swapButton">
+                <img src="./icon/swap.svg" alt="swap colors" id="swapIcon" />
+            </button>
+            <button id="randomiseButton">
+                <img src="./icon/random.svg" alt="randomise colors" id="randomiseIcon" />
+            </button>
+        </li>
+        <li>
+            <input type="text" id="colorZ" class="colorSelector" autocomplete="off" spellcheck="false">
+            <button id="textureButtonZ">
+                <img src="./icon/block.svg" alt="open texture menu" id="stopBlockSelect" class="blockIcon"/>
+            </button>
+        </li>
+    </ul>
+    
+    <div id="advancedControlsBox">
+        <div id="easePresetMenu"></div>
+        <div id="svg" class="svg-wrapper"></div>
+        <div id="optionsBox"></div>
+    </div>
+
+    <div id="textureMenu">
+        <h2>Select a texture</h2>
+        <button id="textureMenuCloseButton">
+            <img src="./icon/close.svg" alt="close texture menu" />
+        </button>
+        <div id="textureMenuWrapper"></div>
+    </div>
+
+    <div id="tooltip">n/a</div>
+</wrapper>
+
+<!-- jQuery -->
+<script src="jquery-3.7.0.min.js"></script>
+<!-- interactiveSVG -->
+<script src="interactiveSVG.js"></script>
+<link rel="stylesheet" type="text/css" href="interactiveSVG.css">
+<!-- keyspline -->
+<script src="keyspline.js"></script>
+<!-- MiniColors -->
+<script src="./MiniColors/jquery.minicolors.js"></script>
+<link rel="stylesheet" href="./MiniColors/jquery.minicolors.css">
+<!-- BlockUtility -->
+<script src="main.js"></script>
+<script src="./data/texturesets/default_1.20.1/default_1.20.1.js"></script>
+</body></html>
