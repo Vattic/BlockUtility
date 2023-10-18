@@ -347,14 +347,14 @@ class GradientSlider {
         $(this.container).css('left', (-1 * ($('#leftHandle').width() / 2)));
 
         var self = this;
-        $('handle').on('mousedown', function(evt) {
+        $('handle').on('mousedown touchstart', function(evt) {
             self.dragged = this;
             if (evt.type === 'touchstart') { evt = evt.touches[0]; }
             // handle offset relative to where it is clicked
             self.offset = evt.pageX - $(this).offset().left;
         });
 
-        $(document).on('mousemove', function(evt) {
+        $(document).on('mousemove touchmove', function(evt) {
             if (self.dragged) {
                 // evt.preventDefault();
 
@@ -409,7 +409,7 @@ class GradientSlider {
             }
         });
 
-        $(document).on('mouseup', function() {
+        $(document).on('mouseup touchend touchcancel', function() {
             if (self.dragged) {
                 self.dragged = false;
             }
