@@ -44,7 +44,8 @@ var Utility = (function() {
      * @param {Number} p percentage as 0-1 with 0.5 being 50%
      */
     var lerp = (start, stop, p) => {
-        return (start + p * (stop - start));
+        let temp = (start + p * (stop - start))
+        return temp;
     }
 
     return {
@@ -323,37 +324,129 @@ class Color {
     }
 }
 
+class GradientSlider {
+    constructor(elementID, updateFunction) {
+        this.leftHandle = 0.25;
+        this.midHandle = 0.5;
+        this.rightHandle = 0.75;
+        this.leftRelative = 0.5;
+        this.rightRelative = 0.5;
+        this.dragged = false;
+        this.container = $('#' + elementID);
+        this.offset = 0;
+
+        if (!this.container) {
+            throw new Error('No element found with id ' + elementID);
+        }
+
+        this.container.append(`<handle id="leftHandle" style="left:${this.leftHandle * 100}%;z-index:1"></handle>`);
+        this.container.append(`<handle id="midHandle" style="left:${this.midHandle * 100}%;z-index:2"></handle>`);
+        this.container.append(`<handle id="rightHandle" style="left:${this.rightHandle * 100}%;z-index:1"></handle>`);
+
+        // offset the container so that the vertical center-line of the handles line up
+        $(this.container).css('left', (-1 * ($('#leftHandle').width() / 2)));
+
+        var self = this;
+        $('handle').on('mousedown', function(evt) {
+            self.dragged = this;
+            // handle offset relative to where it is clicked
+            self.offset = evt.pageX - $(this).offset().left;
+        });
+
+        $(document).on('mousemove', function(evt) {
+            if (self.dragged) {
+                // evt.preventDefault();
+
+                // current mouse position relative to the slider parent container
+                let newX = evt.pageX - self.container.offset().left;
+
+                // handle offset relative to where it is clicked
+                newX -= self.offset;
+
+                // keep handles within bounds both between each other and within parent container
+                const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+                if ($(self.dragged).attr('id') == 'leftHandle') {
+                    newX = clamp(newX, 0, $('#midHandle').position().left - $('#midHandle').width());
+                }
+                else if ($(self.dragged).attr('id') == 'midHandle') {
+                    newX = clamp(newX, 0, self.container.width());
+                }
+                else {
+                    newX = clamp(newX, $('#midHandle').position().left + $('#midHandle').width(), self.container.width());
+                }
+
+                // position as a percent to account for UI resizing
+                newX = newX / self.container.width();
+                if ($(self.dragged).attr('id') == 'leftHandle') {
+                    self.leftHandle = newX;
+                    // left handles position relative to the middle handle
+                    self.leftRelative = newX / self.midHandle;
+                }
+                else if ($(self.dragged).attr('id') == 'midHandle') {
+                    self.midHandle = newX;
+                }
+                else {
+                    self.rightHandle = newX;
+                    // right handles position relative to the middle handle
+                    self.rightRelative = 1 - (1 - newX) / (1 - self.midHandle);
+                }
+
+                $(self.dragged).css('left', newX * 100 + '%');
+
+                if ($(self.dragged).attr('id') == 'midHandle') {
+                    self.leftHandle = Utility.lerp(0, self.midHandle, self.leftRelative);
+                    self.rightHandle = Utility.lerp(self.midHandle, 1, self.rightRelative);
+                    
+                    $('#leftHandle').css('left', self.leftHandle * 100 + '%');
+                    $('#rightHandle').css('left', self.rightHandle * 100 + '%');
+                }
+
+                updateFunction();
+            }
+        });
+
+        $(document).on('mouseup', function() {
+            if (self.dragged) {
+                self.dragged = false;
+            }
+        });
+    }
+
+    get_percent(p) {
+        let handles = [
+            [1, 1],
+            [this.rightHandle, 0.75],
+            [this.midHandle, 0.5],
+            [this.leftHandle, 0.25],
+            [0, 0]
+        ];
+        for (let i = 1; i < handles.length; i++) {
+            // figure out which two handles bound the input
+            let lowerBound = handles[i][0];
+            if (p < lowerBound) {
+                continue;
+            }
+            let upperBound = handles[i - 1][0];
+
+            // percentage difference of input between said handles
+            let q = (p - lowerBound) / (upperBound - lowerBound);
+
+            // percentage mix at that distance along line
+            let lowerP = handles[i][1];
+            let upperP = handles[i - 1][1];
+            return lowerP + q * (upperP - lowerP);
+        }
+    }
+}
+
 var GradientGen = (function() {
     var shortPath = true;
-    var easingFunction;
     var blockA;
     var blockZ;
     var colorA = new Color('rgb', 189, 22, 88);
     var colorZ = new Color('rgb', 48, 255, 82);
-    var easingEditor = {
-        width: 300,
-        height: 300,
-        padding: 10
-    }
-    easingEditor.bounds = {
-        left: easingEditor.padding,
-        top: easingEditor.padding,
-        right: easingEditor.width - easingEditor.padding,
-        bottom: easingEditor.height - easingEditor.padding
-    }
-    var easingPresets = {
-        'linear': {in: [0, 0, 1, 1]},
-        'sine': {in: [0.12, 0, 0.39, 0], out: [0.61, 1, 0.88, 1], inOut: [0.37, 0, 0.63, 1]},
-        'quad': {in: [0.11, 0, 0.5, 0], out: [0.5, 1, 0.89, 1], inOut: [0.45, 0, 0.55, 1]},
-        'cubic': {in: [0.32, 0, 0.67, 0], out: [0.33, 1, 0.68, 1], inOut: [0.65, 0, 0.35, 1]},
-        'quart': {in: [0.5, 0, 0.75, 0], out: [0.25, 1, 0.5, 1], inOut: [0.76, 0, 0.24, 1]},
-        'quint': {in: [0.64, 0, 0.78, 0], out: [0.22, 1, 0.36, 1], inOut: [0.83, 0, 0.17, 1]},
-        'expo': {in: [0.7, 0, 0.84, 0], out: [0.16, 1, 0.3, 1], inOut: [0.87, 0, 0.13, 1]},
-        'circ': {in: [0.55, 0, 1, 0.45], out: [0, 0.55, 0.45, 1], inOut: [0.85, 0, 0.15, 1]}
-    };
-    var easingPresetWidth = 64;
-    var easingPresetHeight = 32;
     var textureBeingPicked;
+    var slider;
 
     /**
      * Converts rgb values into CSS color definition
@@ -379,18 +472,18 @@ var GradientGen = (function() {
     var css_2_rgb = function(cssString) {
         return cssString.replace('rgb(', '').replace(')', '').split(', ').map(Number);
     }
+
     /**
      * 
      * @param {Number} sampleNumber, 
      * @returns 
      */
     var sample_gradient = (sampleNumber = 10) => {
-        get_easing_from_editor();
         let samples = [];
         samples.push(colorA);
         for (let n = 1; n < sampleNumber-1; n++) {
             let p = n / sampleNumber;
-            p = easingFunction(p);
+            p = slider.get_percent(p);
             samples.push(colorA.lerp_with(shortPath, colorZ, p));
         }
         samples.push(colorZ);
@@ -398,7 +491,6 @@ var GradientGen = (function() {
     }
 
     var update_preview_gradient = () => {
-        console.log('preview update');
         let gradientSteps = sample_gradient(50);
         let gradientString = 'linear-gradient(90deg, ';
         for (const color of gradientSteps) {
@@ -431,6 +523,7 @@ var GradientGen = (function() {
         [blockA, blockZ] = [blockZ, blockA];
         [colorA, colorZ] = [colorZ, colorA];
         update_minicolors();
+        update_preview_gradient();
     }
 
     var toggle_path_length = () => {
@@ -442,161 +535,6 @@ var GradientGen = (function() {
             $('#pathIcon').attr('src', './icon/long.svg');
         }
         update_preview_gradient();
-    }
-
-    var get_easing_from_editor = () => {
-        let [left, top, right, bottom] = Object.values(easingEditor.bounds);
-        let [x1, y1] = [easingEditor.control1.x, easingEditor.control1.y];
-        let [x2, y2] = [easingEditor.control2.x, easingEditor.control2.y];
-        [x1, x2] = Utility.normalise([x1, x2], left, right, 0, 1);
-        [y1, y2] = Utility.normalise([y1, y2], top, bottom, 0, 1);
-        y1 = 1 - y1;
-        y2 = 1 - y2;
-        easingFunction = new BezierEasing(x1, y1, x2, y2);
-    }
-
-    function ease_variables(duration, variableDefs) {
-        let definitions = [];
-        let time = 0;
-        for (let definition of variableDefs) {
-            let [x1, y1, x2, y2] = easingPresets[definition.easing][definition.direction];
-            definition = {
-                sn: definition.sn,
-                en: definition.en,
-                easingFunction: new BezierEasing(x1, y1, x2, y2),
-                updateFunction: definition.updateFunction
-            };
-            definitions.push(definition);
-        }
-        (function loop() {
-            let t = time / duration;
-            t = Utility.clamp(t, 0, 1);
-            for (const definition of definitions) {
-                let newValue = Utility.lerp(definition.sn, definition.en, definition.easingFunction(t));
-                definition.updateFunction(newValue);
-            }
-            update_preview_gradient();
-            if (time >= duration) {
-                return;
-            }
-            time++;
-            requestAnimationFrame(loop);
-        })();
-    }
-
-    var select_easing_preset = function() {
-        $('.selectedPreset').removeClass('selectedPreset');
-        if (arguments[0] == 'none') {
-            return;
-        }
-        var easing;
-        var direction;
-        if (arguments[1]) {
-            [easing, direction] = [arguments[0], arguments[1]];
-        }
-        // gets the two keys from the button id
-        else {
-            [easing, direction] = arguments[0].split('-');
-        }
-        $(`#${easing}-${direction} path`).addClass('selectedPreset');
-
-        let [x1, y1, x2, y2] = easingPresets[easing][direction];
-        y1 = 1 - y1;
-        y2 = 1 - y2;
-        [min_x, max_x] = [easingEditor.bounds.left, easingEditor.bounds.right];
-        [min_y, max_y] = [easingEditor.bounds.top, easingEditor.bounds.bottom];
-        [x1, x2] = Utility.normalise([x1, x2], 0, 1, min_x, max_x);
-        [y1, y2] = Utility.normalise([y1, y2], 0, 1, min_y, max_y);
-        let [sx1, sy1] = [easingEditor.control1.x, easingEditor.control1.y];
-        let [sx2, sy2] = [easingEditor.control2.x, easingEditor.control2.y];
-        if (x1 == sx1 && y1 == sy1 && x2 == sx2 && y2 == sy2) {
-            return;
-        }
-        ease_variables(10, [
-            {sn: sx1, en: x1, easing: 'sine', direction: 'inOut', updateFunction: function(n) {
-                easingEditor.control1.update({'x': n})
-            }},
-            {sn: sy1, en: y1, easing: 'sine', direction: 'inOut', updateFunction: function(n) {
-                easingEditor.control1.update({'y': n})
-            }},
-            {sn: sx2, en: x2, easing: 'sine', direction: 'inOut', updateFunction: function(n) {
-                easingEditor.control2.update({'x': n})
-            }},
-            {sn: sy2, en: y2, easing: 'sine', direction: 'inOut', updateFunction: function(n) {
-                easingEditor.control2.update({'y': n})
-            }}
-        ]);
-    }
-
-    var setup_easing_editor = () => {
-        // generate easing preset buttons
-        for (const key in easingPresets) {
-            let easings = easingPresets[key];
-            let html = '<div>';
-            for (const easing in easings) {
-                let [x1, y1, x2, y2] = easings[easing];
-                y1 = 1 - y1;
-                y2 = 1 - y2;
-                [x1, x2] = Utility.normalise([x1, x2], 0, 1, 0, easingPresetWidth);
-                [y1, y2] = Utility.normalise([y1, y2], 0, 1, 0, easingPresetHeight);
-                html += `<button id="${key}-${easing}" class="easingPresetButton">`;
-                html += `<svg xmlns="http://www.w3.org/2000/svg" width="${easingPresetWidth}" height="${easingPresetHeight}" `;
-                html += `viewBox="-2 -2 ${easingPresetWidth + 4} ${easingPresetHeight + 4}">`;
-                html += `<path d="M0 ${easingPresetHeight} C${x1} ${y1} ${x2} ${y2} ${easingPresetWidth} 0">`;
-                html += `</button></svg>`;
-            }
-            html += '</div>'
-            $('#easePresetMenu').append(html);
-        }
-        $(document).on('click', '.easingPresetButton', function() {
-            select_easing_preset($(this).attr('id'));
-        });
-        // tooltip for easing names on mouseover
-        $(document).on('mouseover', '.easingPresetButton', function() {
-            let presetName = $(this).attr('id');
-            if (presetName === 'linear-in') {
-                presetName = 'linear';
-            }
-            presetName = presetName.replace('-', ' ');
-            presetName = presetName.replace('inOut', 'In-Out');
-            $('#tooltip').html(presetName);
-            $('#tooltip').css('left', $(this).offset().left).css('top', $(this).offset().top + $(this).outerHeight());
-            $('#tooltip').show();
-        });
-        $(document).on('mouseleave', '.easingPresetButton', function() {
-            $('#tooltip').hide();
-        });
-
-        // easing editor itself
-        easingEditor.svg = InteractiveSVG.create('svg', easingEditor.width, easingEditor.height);
-        let svg = easingEditor.svg;
-        // bezier
-        let [min_x, min_y, max_x, max_y] = Object.values(easingEditor.bounds);
-        svg.addStaticPoint({label: 'start', x: min_x, y: max_y});
-        svg.addStaticPoint({label: 'end', x: max_x, y: min_y});
-        easingEditor.control1 = svg.addPoint({label: 'control1', x: min_x, y: max_y, 'bounds': easingEditor.bounds});
-        easingEditor.control2 = svg.addPoint({label: 'control2', x: max_x, y: min_y, 'bounds': easingEditor.bounds});
-        svg.addBezier({p1: 'start', p2: 'control1', p3: 'control2', p4: 'end', showHandles: true});
-        // diagonal
-        svg.addLine({p1: 'start', p2: 'end'});
-        // grid
-        let step = ((max_y - min_y) / 6);
-        for (let y = min_y; y <= max_y; y += step) {
-            svg.addLine({p1: {x: min_x, y:y}, p2: {x: max_x, y: y}});
-        }
-        step = ((max_x - min_x) / 6);
-        for (let x = min_x; x <= max_x; x += step) {
-            svg.addLine({p1: {x: x, y: min_y}, p2: {x: x, y: max_y}});
-        }
-        select_easing_preset('linear', 'in');
-        
-        $(document).on('mousemove', function() {
-            if (svg.selected) {
-                get_easing_from_editor();
-                select_easing_preset('none');
-                update_preview_gradient();
-            }
-        });
     }
 
     var populate_texture_menu = () => {
@@ -664,6 +602,7 @@ var GradientGen = (function() {
     }
 
     var main = () => {
+        slider = new GradientSlider('slider', update_preview_gradient);
         // RGB Color Pickers
         $('#colorA').minicolors({
             control: 'hue',
@@ -689,10 +628,9 @@ var GradientGen = (function() {
         $(document).on('click', '#randomiseButton', randomise_textures);
         $(document).on('click', '#swapButton', swap);
         $(document).on('click', '#pathButton', toggle_path_length);
-        setup_easing_editor();
         setup_texture_menu();
 
-        update_preview_gradient();
+        update_preview_gradient(); 
     }
 
     $(document).ready(function() {
