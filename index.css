@@ -212,6 +212,7 @@ button:hover {
     overflow-x: hidden;
     display: none;
     text-align: center;
+    z-index: 3;
 }
 
 #textureMenuWrapper {
