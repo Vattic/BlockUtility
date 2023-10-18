@@ -71,6 +71,18 @@ handle {
     user-select: none; /* Standard syntax */
 }
 
+@media (max-width: 600px) {
+    handle {
+        width: 1.8rem;
+        height: 1.8rem;
+        background-size: 1.8rem;
+    }
+
+    #slider {
+        height: 0.5rem;
+    }
+}
+
 /* gradient preview */
 #gradientBox {
     background-color: rgb(34, 34, 34);
@@ -97,11 +109,24 @@ ul#gradientControls {
     border-left: 0.1rem solid rgb(70, 70, 70);
     margin: 0;
     padding: 0;
+    flex-wrap: wrap;
 }
 
 ul#gradientControls > li {
     display: flex;
     margin: 0.4rem;
+}
+
+@media (max-width: 600px) {
+    ul#gradientControls > li:nth-child(1) {
+        order: 1;
+    }
+    ul#gradientControls > li:nth-child(2) {
+        order: 3;
+    }
+    ul#gradientControls > li:nth-child(3) {
+        order: 2;
+    }
 }
 
 li#centerControls {
@@ -155,6 +180,23 @@ button:hover {
     height: 1.63rem !important;
     width: 1.63rem !important;
     top: 0.3rem !important;
+}
+
+@media (max-width: 600px) {
+    .minicolors-position-right > .minicolors-input {
+        padding-left: 2.5rem !important;
+        padding-right: 0.4rem !important;
+        text-align: left;
+    }
+
+    .minicolors-theme-default.minicolors-position-right .minicolors-swatch {
+        right: auto !important;
+        left: 5px !important;
+    }
+
+    #textureButtonZ {
+        order: -1;
+    }
 }
 
 #textureMenuCloseButton {
