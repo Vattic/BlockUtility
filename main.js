@@ -349,6 +349,7 @@ class GradientSlider {
         var self = this;
         $('handle').on('mousedown', function(evt) {
             self.dragged = this;
+            if (evt.type === 'touchstart') { evt = evt.touches[0]; }
             // handle offset relative to where it is clicked
             self.offset = evt.pageX - $(this).offset().left;
         });
@@ -356,6 +357,9 @@ class GradientSlider {
         $(document).on('mousemove', function(evt) {
             if (self.dragged) {
                 // evt.preventDefault();
+
+                // Get dragging to work on touch device
+                if (evt.type === 'touchmove') { evt = evt.touches[0]; }
 
                 // current mouse position relative to the slider parent container
                 let newX = evt.pageX - self.container.offset().left;
@@ -366,13 +370,13 @@ class GradientSlider {
                 // keep handles within bounds both between each other and within parent container
                 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
                 if ($(self.dragged).attr('id') == 'leftHandle') {
-                    newX = clamp(newX, 0, $('#midHandle').position().left - $('#midHandle').width());
+                    newX = clamp(newX, 0, $('#midHandle').position().left - 5);
                 }
                 else if ($(self.dragged).attr('id') == 'midHandle') {
                     newX = clamp(newX, 0, self.container.width());
                 }
                 else {
-                    newX = clamp(newX, $('#midHandle').position().left + $('#midHandle').width(), self.container.width());
+                    newX = clamp(newX, $('#midHandle').position().left + 5, self.container.width());
                 }
 
                 // position as a percent to account for UI resizing
