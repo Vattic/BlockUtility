@@ -233,12 +233,20 @@ button:hover {
     image-rendering: pixelated;
 }
 
+@media (max-width: 600px) {
+    .textureIcon {
+        width: 3rem;
+        height: 3rem;
+    }
+}
+
 #textureMenu img.textureIcon:hover {
     box-shadow: 0 0 0 0.2rem #FFFFFF, 0 0 8px 4px #000000;
 }
 
 #textureMenu {
     backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
     background-color: rgba(22, 22, 22, 10%);
     position: absolute;
     top: 0;
