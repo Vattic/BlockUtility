@@ -280,6 +280,7 @@ button:hover {
 	font-size: 0.9rem;
     letter-spacing: 0rem;
 	pointer-events: none;
+    z-index: 10;
 }
 
 /* link to source */
