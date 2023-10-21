@@ -338,20 +338,24 @@ class GradientSlider {
         if (!this.container) {
             throw new Error('No element found with id ' + elementID);
         }
+        this.container.append(`<handle id="leftHandle" style="left:${this.leftHandle * 100}%;z-index:2"></handle>`);
+        this.container.append(`<handle id="midHandle" style="left:${this.midHandle * 100}%;z-index:3"></handle>`);
+        this.container.append(`<handle id="rightHandle" style="left:${this.rightHandle * 100}%;z-index:2"></handle>`);
 
-        this.container.append(`<handle id="leftHandle" style="left:${this.leftHandle * 100}%;z-index:1"></handle>`);
-        this.container.append(`<handle id="midHandle" style="left:${this.midHandle * 100}%;z-index:2"></handle>`);
-        this.container.append(`<handle id="rightHandle" style="left:${this.rightHandle * 100}%;z-index:1"></handle>`);
-
-        // offset the container so that the vertical center-line of the handles line up
-        $(this.container).css('left', (-1 * ($('#leftHandle').width() / 2)));
+        // offset the handles so that their centre lines up with edges
+        $('handle').css('margin-left', (-1 * ($('#leftHandle').outerWidth() / 2)));
 
         var self = this;
         $('handle').on('mousedown touchstart', function(evt) {
+            if ($(this).attr('id') == 'startHandle' || $(this).attr('id') == 'endHandle') {
+                return;
+            }
             self.dragged = this;
             if (evt.type === 'touchstart') { evt = evt.touches[0]; }
             // handle offset relative to where it is clicked
-            self.offset = evt.pageX - $(this).offset().left;
+            self.offset = evt.pageX - $(this).offset().left - ($('#leftHandle').outerWidth() / 2);
+            // console.log(evt.pageX)
+            // console.log($(this).offset().left)
         });
 
         $(document).on('mousemove touchmove', function(evt) {
@@ -501,6 +505,13 @@ var GradientGen = (function() {
             gradientString += rgb_2_css(color.rgb) + ', ';
         }
         $('#gradientPreview').css('background-image', gradientString.slice(0, -2));
+
+        let handleColor = colorA.lerp_with(shortPath, colorZ, 0.5);
+        $('#midHandle').css('background', rgb_2_css(handleColor.rgb));
+        handleColor = colorA.lerp_with(shortPath, colorZ, 0.25);
+        $('#leftHandle').css('background', rgb_2_css(handleColor.rgb));
+        handleColor = colorA.lerp_with(shortPath, colorZ, 0.75);
+        $('#rightHandle').css('background', rgb_2_css(handleColor.rgb));
     }
 
     var update_minicolors = () => {

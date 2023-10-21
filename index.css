@@ -3,6 +3,7 @@ html {
     font-size: 100%;
     color: white;
     letter-spacing: -0.022rem;
+    overflow-x: hidden;
 }
 
 body {
@@ -10,285 +11,124 @@ body {
     background-color: rgb(38, 38, 38);
 }
 
-input {
-    font: inherit;
-    letter-spacing: inherit;
-    color: inherit;
-}
-
-/* header menu */
 header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
     background-color: rgb(60, 60, 60);
-    border-bottom: 0.1rem solid rgb(70, 70, 70);
-    overflow: auto;
-    padding: 0 1.5rem;
+    padding: 0 0.8rem;
 }
 
-header ul {
-    list-style: none;
-}
-
-header ul li {
-    display: inline-block;
-    margin: 0.3rem 1rem 0;
-    color: inherit;
-}
-
-header a {
-    color: inherit;
-    text-decoration: inherit;
-}
-
-/* main page */
 wrapper {
     display: block;
-    margin: 0 auto;
-    padding: 1rem;
-    max-width: 46rem;
+    background-color: rgb(60, 60, 60);
+    padding-bottom: 1rem;
 }
+
+/* gradient preview */
+#gradientPreview {
+    height: 3rem;
+    margin: 0 1rem;
+    border: solid 0.4rem rgb(38, 38, 38);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15);
+}
+
+/* figure {
+    display: flex;
+} */
 
 /* color stop slider */
 #slider {
     position: relative;
-    margin: 0.2rem 0.4rem;
     overflow: visible;
-    height: 0.2rem;
+    height: 1rem;
+    margin: 0.8rem 1.3rem;
+    background: rgb(38, 38, 38);
+    border-radius: 1rem;
 }
 
 handle {
     position: absolute;
-    width: 1rem;
-    height: 1rem;
-    background-image: url('./icon/down.svg');
-    background-size: 1rem;
-    background-repeat: no-repeat;
-    cursor: pointer;
+    top: -0.5rem;
+    width: 2rem;
+    height: 2rem;
+    border: solid 0.3rem white;
+    border-radius: 50%;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    cursor: ew-resize;
     -webkit-user-select: none; /* Safari */
     -ms-user-select: none; /* IE 10 and IE 11 */
     user-select: none; /* Standard syntax */
+    touch-action: none;
+    /* overflow: clip; */
 }
 
-@media (max-width: 600px) {
-    handle {
-        width: 1.8rem;
-        height: 1.8rem;
-        background-size: 1.8rem;
-    }
-
-    #slider {
-        height: 0.5rem;
-    }
+/* buttons - universal */
+button:hover {
+    cursor: pointer;
 }
 
-/* gradient preview */
-#gradientBox {
-    background-color: rgb(34, 34, 34);
-    border-top: 0.1rem solid rgb(66, 66, 66);
-    border-right: 0.1rem solid rgb(66, 66, 66);
-    border-left: 0.1rem solid rgb(66, 66, 66);
-    border-radius: 0.3rem 0.3rem 0 0;
-    overflow: visible;
-    padding-bottom: 0.4rem;
+button {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
 }
 
-#gradientPreview {
-    height: 3rem;
-    margin: 0 0.4rem 0;
+button > img {
+    height: 2rem;
 }
 
-/* color menu and basic controls */
+/* color picker */
 ul#gradientControls {
     list-style: none;
     display: flex;
     justify-content: space-between;
     background-color: rgb(60, 60, 60);
-    border-right: 0.1rem solid rgb(70, 70, 70);
-    border-left: 0.1rem solid rgb(70, 70, 70);
     margin: 0;
     padding: 0;
     flex-wrap: wrap;
+    margin: 0 1rem;
+    padding: 0.5rem 0.4rem;
 }
 
+/* gradient controls */
 ul#gradientControls > li {
     display: flex;
-    margin: 0.4rem;
+    height: 2rem;
 }
 
-@media (max-width: 600px) {
-    ul#gradientControls > li:nth-child(1) {
-        order: 1;
-    }
-    ul#gradientControls > li:nth-child(2) {
-        order: 3;
-    }
-    ul#gradientControls > li:nth-child(3) {
-        order: 2;
-    }
+.minicolors-swatch {
+    height: 2rem !important;
+    width: 2rem !important;
 }
 
-li#centerControls {
+ul#gradientControls li > div {
+    outline: solid 0.4rem rgb(38, 38, 38);
+}
+
+#centerControls {
     flex-grow: 1;
     justify-content: space-between;
-    border-left: 0.15rem solid rgb(100, 100, 100);
-    border-right: 0.15rem solid rgb(100, 100, 100);
-    padding: 0 0.5rem;
+    padding: 0 2rem;
 }
 
-/* buttons */
-button:hover {
-    cursor: pointer;
-}
-
-#randomiseButton, #swapButton, #pathButton, #textureButtonA, #textureButtonZ {
-    background-color: transparent;
-    border: none;
-    margin: 0.1rem 0;
-    height: 1.8rem;
-}
-
-#randomiseIcon, #swapIcon, #pathIcon, .blockIcon {
-    width: 2rem;
-}
-
-/* color picker */
-.minicolors-theme-default.minicolors {
-    /* margin: 0.3rem; */
-    display: block !important;
-}
-
-.minicolors-theme-default .minicolors-input {
-    background-color: rgb(38, 38, 38) !important;
-    border: .1rem solid rgb(66, 66, 66);
-    height: 2rem !important;
-}
-
-.minicolors-position-left > .minicolors-input {
-    padding-left: 2.5rem !important;
-    padding-right: 0.4rem !important;
-}
-
-.minicolors-position-right > .minicolors-input {
-    padding-left: 0.4rem !important;
-    padding-right: 2.5rem !important;
-    text-align: right;
-}
-
-.minicolors-theme-default .minicolors-swatch {
-    height: 1.63rem !important;
-    width: 1.63rem !important;
-    top: 0.3rem !important;
-}
-
-@media (max-width: 600px) {
-    .minicolors-position-right > .minicolors-input {
-        padding-left: 2.5rem !important;
-        padding-right: 0.4rem !important;
-        text-align: left;
-    }
-
-    .minicolors-theme-default.minicolors-position-right .minicolors-swatch {
-        right: auto !important;
-        left: 5px !important;
-    }
-
-    #textureButtonZ {
-        order: -1;
-    }
-}
-
-#textureMenuCloseButton {
-    background-color: transparent;
-    border: 0.15rem solid rgb(196, 196, 196);
-    border-radius: 20rem;
-    width: 2.5rem;
-    height: 2.5rem;
-    position: fixed;
-    right: 1rem;
-    top: 1rem;
-}
-
-#textureMenuCloseButton:hover {
-    border: 0.15rem solid white;
-}
-
-#textureMenuCloseButton > img {
-    width: 1.5rem;
-}
-
-/* texture menu */
-.textureButton {
-    background-color: transparent;
-    border: none;
-    margin: 0;
-    padding: 0.2rem;
-}
-
-.textureIcon {
-    width: 5rem;
-    height: 5rem;
-    display: block;
-    image-rendering: pixelated;
-}
-
-@media (max-width: 600px) {
-    .textureIcon {
-        width: 3rem;
-        height: 3rem;
-    }
-}
-
-#textureMenu img.textureIcon:hover {
-    box-shadow: 0 0 0 0.2rem #FFFFFF, 0 0 8px 4px #000000;
-}
-
-#textureMenu {
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
-    background-color: rgba(22, 22, 22, 10%);
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
+/* figure > button {
+    width: 50%;
     height: 100%;
-    overflow-x: hidden;
-    display: none;
-    text-align: center;
-    z-index: 3;
 }
 
-#textureMenuWrapper {
-    margin: 0 auto;
-    padding: 0 2.4rem;
-    max-width: 60rem;
-    text-align: left;
-    line-height: 0;
-    padding-bottom: 5rem;
+figure > button:hover {
+    outline: solid 0.3rem white;
+} */
+
+
+/* texture picker */
+#texturePicker {
+    display: none;
 }
 
 /* tooltip */
 #tooltip {
     display: none;
-    position: absolute;
-    text-transform: capitalize;
-    padding: 0.1rem 0.6rem 0.3rem;	
-	background: #242135cc;	color: #fff;
-	border-radius: 0 10px 10px 10px;
-	box-shadow: 0px 1px 3px #0004;
-	font-size: 0.9rem;
-    letter-spacing: 0rem;
-	pointer-events: none;
-    z-index: 10;
-}
-
-/* link to source */
-#sourceLink {
-    float: right;
-    color: inherit;
-    text-decoration: inherit;
-}
-#sourceLink i {
-    margin-right: 0.3rem;
 }
