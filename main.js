@@ -521,6 +521,23 @@ var GradientGen = (function() {
     }
 
     var setup_stop_slider = () => {
+
+        var calculate_left = () => {
+            let fromLeft = $('#handleLeft').data('percent') / $('#handleMid').data('percent');
+            if (isNaN(fromLeft)) {
+                fromLeft = 0;
+            }
+            return fromLeft;
+        }
+
+        var calculate_right = () => {
+            let fromMid = ($('#handleRight').data('percent') - $('#handleMid').data('percent')) / (100 - $('#handleMid').data('percent'));
+            if (isNaN(fromMid)) {
+                fromMid = 0;
+            }
+            return fromMid;
+        }
+
         stopSlider = new Slider('stopSlider');
         stopSlider.addHandle({
             id: 'handleLeft',
@@ -530,8 +547,7 @@ var GradientGen = (function() {
                 let handleRadiusPercent = ($('#handleMid').width() / 2) / $(stopSlider.container).width();
                 $('#handleLeft').data('max', $('#handleMid').data('percent') - handleRadiusPercent * 100);
                 // store % distance to middle handle
-                let fromLeft = $('#handleLeft').data('percent') / $('#handleMid').data('percent');
-                $('#handleLeft').data('fromLeft', fromLeft);
+                $('#handleLeft').data('fromLeft', calculate_left());
 
                 update_preview_gradient();
             }
@@ -554,18 +570,17 @@ var GradientGen = (function() {
             id: 'handleMid',
             value: 50,
             change: function() {
+                // store % distance to middle handle if not already stored
                 if (!$('#handleLeft').data('fromLeft')) {
-                    let fromLeft = $('#handleLeft').data('percent') / $('#handleMid').data('percent');
-                    $('#handleLeft').data('fromLeft', fromLeft);
+                    $('#handleLeft').data('fromLeft', calculate_left());
                 }
+                if (!$('#handleRight').data('fromMid')) {
+                    $('#handleRight').data('fromMid', calculate_right());
+                }
+                // move the left and right handles to keep their % distance from middle handle constant
                 let percent = $('#handleMid').data('percent') * $('#handleLeft').data('fromLeft');
                 $('#handleLeft').css('left', percent + '%');
                 $('#handleLeft').data('percent', percent);
-
-                if (!$('#handleRight').data('fromMid')) {
-                    let fromMid = ($('#handleRight').data('percent') - $('#handleMid').data('percent')) / (100 - $('#handleMid').data('percent'));
-                    $('#handleRight').data('fromMid', fromMid);
-                }
                 percent = $('#handleMid').data('percent') + $('#handleRight').data('fromMid') * (100 - $('#handleMid').data('percent'));
                 $('#handleRight').css('left', percent + '%');
                 $('#handleRight').data('percent', percent);
