@@ -3,6 +3,7 @@
     --handleHeight: 2rem;
     --trackColor: dimgrey;
     --backgroundColor: transparent;
+    --inputBuffer: 3ch;
 }
 
 .slider {
@@ -12,6 +13,10 @@
     margin-right: calc(var(--handleWidth) / 2);
     height: var(--handleHeight);
     overflow: visible;
+}
+
+.withInput {
+    margin-right: calc(var(--handleWidth) / 2 + var(--inputBuffer));
 }
 
 .slider::after {
@@ -54,4 +59,14 @@ handle {
     -ms-user-select: none; /* IE 10 and IE 11 */
     user-select: none; /* Standard syntax */
     touch-action: none;
+}
+
+.slider input {
+    position: absolute;
+    left: calc(100% + var(--handleWidth) / 2);
+    width: 3ch;
+    align-self: center;
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+    
 }

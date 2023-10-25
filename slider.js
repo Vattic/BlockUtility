@@ -19,7 +19,21 @@ class Slider {
         if (!this.container) { throw new Error('No element found with id ' + elementID); }
 
         this.container.addClass('slider');
+        this.container.addClass('withInput');
+
+        //add text input to each slider
+        if (this.showInput){
+            let input = $('<input>', {
+                type: 'number',
+                autocomplete: 'off',
+                spellcheck: 'off'
+            });
+            this.container.append(input);
+        }
     }
+
+    clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+
     /**
      * Get the value of a given handle
      * @param {*} handle either a string with html id of handle element, or selected jquery element
@@ -90,13 +104,8 @@ class Slider {
             $(handle).data(attributeName, data[attributeName]);
         }
         this.container.append(handle);
-        // add text input to each slider
-        // if (this.showInput){
-        //     let input = $('<input>', {
-
-        //     });
-        //     this.container.append(input);
-        // }
+        // set input to show starting value
+        $(this.container).find('input').val(data.value);
         
         var self = this;
 
@@ -121,15 +130,18 @@ class Slider {
                 // handle offset relative to where it is grabbed
                 newX -= self.dragOffset;
                 // clamp handle to be in range min - max, and then within container range (% of container width)
-                const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
-                newX = clamp(newX, self.container.width() * ($(self.draggedElement).data('min') / 100), self.container.width() * ($(self.draggedElement).data('max') / 100));
-                newX = clamp(newX, 0, self.container.width());
+                newX = self.clamp(newX, self.container.width() * ($(self.draggedElement).data('min') / 100), self.container.width() * ($(self.draggedElement).data('max') / 100));
+                newX = self.clamp(newX, 0, self.container.width());
                 // position as a percentage to account for UI resizing
                 newX = (newX / self.container.width()) * 100;
 
                 $(self.draggedElement).data('percent', newX);
 
                 $(self.draggedElement).css('left', newX + '%');
+                // set input to new value
+                if (self.showInput) {
+                    $(self.draggedElement).parent().find('input').val(self.handle_value($(self.draggedElement)));
+                }
 
                 $(self.draggedElement).data('change')();
             }
@@ -139,5 +151,14 @@ class Slider {
             self.draggedElement = false;
         });
 
+        $(handle).parent().find('input').on('keyup wheel', function() {
+            let value = $(this).val();
+            let percent = self.value_to_percent(value);
+            percent = self.clamp(percent, $(handle).data('min'), $(handle).data('max'))
+            $(handle).data('percent', percent);
+            $(handle).css('left', percent + '%');
+            $(this).val(self.percent_to_value(percent));
+            $(handle).data('change')();
+        });
     }
 }

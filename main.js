@@ -338,7 +338,7 @@ var GradientGen = (function() {
     var lightnessSlider;
 
     /**
-     * Converts rgb lightnesss into CSS color definition
+     * Converts rgb value into CSS color definition
      * @param {*} _args Either Array [r, g, b], or 3 arguments r, g, b. Numbers between 0-255
      * @returns String "rgb(r, g, b)"
      */
