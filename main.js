@@ -374,7 +374,7 @@ class GradientSlider {
                 // keep handles within bounds both between each other and within parent container
                 const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
                 if ($(self.dragged).attr('id') == 'leftHandle') {
-                    newX = clamp(newX, 0, $('#midHandle').position().left - 5);
+                    newX = clamp(newX, 0, Math.max(0, $('#midHandle').position().left - 5));
                 }
                 else if ($(self.dragged).attr('id') == 'midHandle') {
                     newX = clamp(newX, 0, self.container.width());
@@ -414,9 +414,7 @@ class GradientSlider {
         });
 
         $(document).on('mouseup touchend touchcancel', function() {
-            if (self.dragged) {
-                self.dragged = false;
-            }
+            self.dragged = false;
         });
     }
 
@@ -449,6 +447,7 @@ class GradientSlider {
 
 var GradientGen = (function() {
     var shortPath = true;
+    var root = document.querySelector(':root');
     var blockA;
     var blockZ;
     var colorA = new Color('rgb', 189, 22, 88);
@@ -504,7 +503,7 @@ var GradientGen = (function() {
         for (const color of gradientSteps) {
             gradientString += rgb_2_css(color.rgb) + ', ';
         }
-        $('#gradientPreview').css('background-image', gradientString.slice(0, -2));
+        root.style.setProperty('--previewGradient', gradientString.slice(0, -2));
 
         let handleColor = colorA.lerp_with(shortPath, colorZ, 0.5);
         $('#midHandle').css('background', rgb_2_css(handleColor.rgb));
