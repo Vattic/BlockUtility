@@ -1,0 +1,57 @@
+:root {
+    --handleWidth: 2rem;
+    --handleHeight: 2rem;
+    --trackColor: dimgrey;
+    --backgroundColor: transparent;
+}
+
+.slider {
+    display: flex;
+    position: relative;
+    margin-left: calc(var(--handleWidth) / 2); /* stops the handles from extending beyond edges */
+    margin-right: calc(var(--handleWidth) / 2);
+    height: var(--handleHeight);
+    overflow: visible;
+}
+
+.slider::after {
+    content: '';
+    display: block;
+    z-index: 2;
+    margin: auto;
+    height: 0.5rem;
+    width: 100%;
+    border-radius: 1rem;
+    background-color: var(--trackColor);
+}
+
+.slider::before {
+    content: '';
+    display: block;
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: calc(-1 * (var(--handleWidth) / 2));
+    width: calc(100% + var(--handleWidth));
+    height: 100%;
+    background-color: var(--backgroundColor);
+}
+
+handle {
+    position: absolute;
+    z-index: 3;
+    margin-left: calc(var(--handleWidth) / 2 * -1); /* centers the handle */
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    width: var(--handleWidth);
+    height: var(--handleHeight);
+    background-color: black;
+    border: solid 0.3rem black;
+    border-radius: 50%;
+    cursor: ew-resize;
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+    touch-action: none;
+}

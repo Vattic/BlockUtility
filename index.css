@@ -1,5 +1,8 @@
 :root {
     --previewGradient: linear-gradient(to right, var(--colorA), 10%, 80%, var(--colorZ));
+    --leftHandleColor: rgb(0, 0, 0);
+    --midHandleColor: rgb(0, 0, 0);
+    --rightHandleColor: rgb(0, 0, 0);
 }
 
 
@@ -19,19 +22,19 @@ body {
 header {
     display: flex;
     background-color: rgb(60, 60, 60);
-    padding: 0 0.8rem;
+    padding: 0 1rem;
 }
 
 wrapper {
     display: block;
     background-color: rgb(60, 60, 60);
-    padding-bottom: 1rem;
+    padding: 0 1rem 1rem;
 }
 
 /* gradient preview */
 #gradientPreview {
     height: 3rem;
-    margin: 0 1rem;
+    margin: 0;
     border: solid 0.4rem rgb(38, 38, 38);
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15);
 }
@@ -40,38 +43,33 @@ figure {
     background-image: var(--previewGradient);
 }
 
-/* figure {
-    display: flex;
+/* color stop slider */
+
+/* #stopSlider::before {
+    background-color: rgb(38, 38, 38);
+    border-radius: 1rem;
 } */
 
-/* color stop slider */
-#slider {
-    position: relative;
-    overflow: visible;
-    height: 1rem;
-    margin: 0.8rem 1.3rem;
-    border-radius: 1rem;
+#stopSlider::after {
     background-image: var(--previewGradient);
     outline: solid 0.35rem rgb(38, 38, 38);
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15);
 }
 
-handle {
-    position: absolute;
-    top: -0.5rem;
-    width: 2rem;
-    height: 2rem;
-    border: solid 0.3rem white;
-    border-radius: 50%;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    cursor: ew-resize;
-    -webkit-user-select: none; /* Safari */
-    -ms-user-select: none; /* IE 10 and IE 11 */
-    user-select: none; /* Standard syntax */
-    touch-action: none;
-    /* overflow: clip; */
+#stopSlider handle {
+    border-color: white !important;
+}
+
+#handleLeft {
+    background-color: var(--leftHandleColor);
+}
+
+#handleMid {
+    background-color: var(--midHandleColor);
+}
+
+#handleRight {
+    background-color: var(--rightHandleColor);
 }
 
 /* buttons - universal */
@@ -99,7 +97,6 @@ ul#gradientControls {
     margin: 0;
     padding: 0;
     flex-wrap: wrap;
-    margin: 0 1rem;
     padding: 0.5rem 0.4rem;
 }
 

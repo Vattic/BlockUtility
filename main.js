@@ -324,127 +324,6 @@ class Color {
     }
 }
 
-class GradientSlider {
-    constructor(elementID, updateFunction) {
-        this.leftHandle = 0.25;
-        this.midHandle = 0.5;
-        this.rightHandle = 0.75;
-        this.leftRelative = 0.5;
-        this.rightRelative = 0.5;
-        this.dragged = false;
-        this.container = $('#' + elementID);
-        this.offset = 0;
-
-        if (!this.container) {
-            throw new Error('No element found with id ' + elementID);
-        }
-        this.container.append(`<handle id="leftHandle" style="left:${this.leftHandle * 100}%;z-index:2"></handle>`);
-        this.container.append(`<handle id="midHandle" style="left:${this.midHandle * 100}%;z-index:3"></handle>`);
-        this.container.append(`<handle id="rightHandle" style="left:${this.rightHandle * 100}%;z-index:2"></handle>`);
-
-        // offset the handles so that their centre lines up with edges
-        $('handle').css('margin-left', (-1 * ($('#leftHandle').outerWidth() / 2)));
-
-        var self = this;
-        $('handle').on('mousedown touchstart', function(evt) {
-            if ($(this).attr('id') == 'startHandle' || $(this).attr('id') == 'endHandle') {
-                return;
-            }
-            self.dragged = this;
-            if (evt.type === 'touchstart') { evt = evt.touches[0]; }
-            // handle offset relative to where it is clicked
-            self.offset = evt.pageX - $(this).offset().left - ($('#leftHandle').outerWidth() / 2);
-            // console.log(evt.pageX)
-            // console.log($(this).offset().left)
-        });
-
-        $(document).on('mousemove touchmove', function(evt) {
-            if (self.dragged) {
-                // evt.preventDefault();
-
-                // Get dragging to work on touch device
-                if (evt.type === 'touchmove') { evt = evt.touches[0]; }
-
-                // current mouse position relative to the slider parent container
-                let newX = evt.pageX - self.container.offset().left;
-
-                // handle offset relative to where it is clicked
-                newX -= self.offset;
-
-                // keep handles within bounds both between each other and within parent container
-                const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
-                if ($(self.dragged).attr('id') == 'leftHandle') {
-                    newX = clamp(newX, 0, Math.max(0, $('#midHandle').position().left - 5));
-                }
-                else if ($(self.dragged).attr('id') == 'midHandle') {
-                    newX = clamp(newX, 0, self.container.width());
-                }
-                else {
-                    newX = clamp(newX, $('#midHandle').position().left + 5, self.container.width());
-                }
-
-                // position as a percent to account for UI resizing
-                newX = newX / self.container.width();
-                if ($(self.dragged).attr('id') == 'leftHandle') {
-                    self.leftHandle = newX;
-                    // left handles position relative to the middle handle
-                    self.leftRelative = newX / self.midHandle;
-                }
-                else if ($(self.dragged).attr('id') == 'midHandle') {
-                    self.midHandle = newX;
-                }
-                else {
-                    self.rightHandle = newX;
-                    // right handles position relative to the middle handle
-                    self.rightRelative = 1 - (1 - newX) / (1 - self.midHandle);
-                }
-
-                $(self.dragged).css('left', newX * 100 + '%');
-
-                if ($(self.dragged).attr('id') == 'midHandle') {
-                    self.leftHandle = Utility.lerp(0, self.midHandle, self.leftRelative);
-                    self.rightHandle = Utility.lerp(self.midHandle, 1, self.rightRelative);
-                    
-                    $('#leftHandle').css('left', self.leftHandle * 100 + '%');
-                    $('#rightHandle').css('left', self.rightHandle * 100 + '%');
-                }
-
-                updateFunction();
-            }
-        });
-
-        $(document).on('mouseup touchend touchcancel', function() {
-            self.dragged = false;
-        });
-    }
-
-    get_percent(p) {
-        let handles = [
-            [1, 1],
-            [this.rightHandle, 0.75],
-            [this.midHandle, 0.5],
-            [this.leftHandle, 0.25],
-            [0, 0]
-        ];
-        for (let i = 1; i < handles.length; i++) {
-            // figure out which two handles bound the input
-            let lowerBound = handles[i][0];
-            if (p < lowerBound) {
-                continue;
-            }
-            let upperBound = handles[i - 1][0];
-
-            // percentage difference of input between said handles
-            let q = (p - lowerBound) / (upperBound - lowerBound);
-
-            // percentage mix at that distance along line
-            let lowerP = handles[i][1];
-            let upperP = handles[i - 1][1];
-            return lowerP + q * (upperP - lowerP);
-        }
-    }
-}
-
 var GradientGen = (function() {
     var shortPath = true;
     var root = document.querySelector(':root');
@@ -453,7 +332,7 @@ var GradientGen = (function() {
     var colorA = new Color('rgb', 189, 22, 88);
     var colorZ = new Color('rgb', 48, 255, 82);
     var textureBeingPicked;
-    var slider;
+    var stopSlider;
 
     /**
      * Converts rgb values into CSS color definition
@@ -490,11 +369,37 @@ var GradientGen = (function() {
         samples.push(colorA);
         for (let n = 1; n < sampleNumber-1; n++) {
             let p = n / sampleNumber;
-            p = slider.get_percent(p);
+            p = get_percent(p);
             samples.push(colorA.lerp_with(shortPath, colorZ, p));
         }
         samples.push(colorZ);
         return samples;
+    }
+
+    var get_percent = (p) => {
+        let handles = [
+            [1, 1],
+            [$('#handleRight').data('percent') / 100, 0.75],
+            [$('#handleMid').data('percent') / 100, 0.5],
+            [$('#handleLeft').data('percent') / 100, 0.25],
+            [0, 0]
+        ];
+        for (let i = 1; i < handles.length; i++) {
+            // figure out which two handles bound the input
+            let lowerBound = handles[i][0];
+            if (p < lowerBound) {
+                continue;
+            }
+            let upperBound = handles[i - 1][0];
+
+            // percentage difference of input between said handles
+            let q = (p - lowerBound) / (upperBound - lowerBound);
+
+            // percentage mix at that distance along line
+            let lowerP = handles[i][1];
+            let upperP = handles[i - 1][1];
+            return lowerP + q * (upperP - lowerP);
+        }
     }
 
     var update_preview_gradient = () => {
@@ -504,13 +409,13 @@ var GradientGen = (function() {
             gradientString += rgb_2_css(color.rgb) + ', ';
         }
         root.style.setProperty('--previewGradient', gradientString.slice(0, -2));
-
+        // set the handle colors
         let handleColor = colorA.lerp_with(shortPath, colorZ, 0.5);
-        $('#midHandle').css('background', rgb_2_css(handleColor.rgb));
+        root.style.setProperty('--midHandleColor', rgb_2_css(handleColor.rgb));
         handleColor = colorA.lerp_with(shortPath, colorZ, 0.25);
-        $('#leftHandle').css('background', rgb_2_css(handleColor.rgb));
+        root.style.setProperty('--leftHandleColor', rgb_2_css(handleColor.rgb));
         handleColor = colorA.lerp_with(shortPath, colorZ, 0.75);
-        $('#rightHandle').css('background', rgb_2_css(handleColor.rgb));
+        root.style.setProperty('--rightHandleColor', rgb_2_css(handleColor.rgb));
     }
 
     var update_minicolors = () => {
@@ -615,8 +520,63 @@ var GradientGen = (function() {
         });
     }
 
+    var setup_stop_slider = () => {
+        stopSlider = new Slider('stopSlider');
+        stopSlider.addHandle({
+            id: 'handleLeft',
+            value: 25,
+            change: function() {
+                // stop the left handle from going past the middle handle
+                let handleRadiusPercent = ($('#handleMid').width() / 2) / $(stopSlider.container).width();
+                $('#handleLeft').data('max', $('#handleMid').data('percent') - handleRadiusPercent * 100);
+                // store % distance to middle handle
+                let fromLeft = $('#handleLeft').data('percent') / $('#handleMid').data('percent');
+                $('#handleLeft').data('fromLeft', fromLeft);
+
+                update_preview_gradient();
+            }
+        });
+        stopSlider.addHandle({
+            id: 'handleRight',
+            value: 75,
+            change: function() {
+                // stop the right handle from going past the middle handle
+                let handleRadiusPercent = ($('#handleMid').width() / 2) / $(stopSlider.container).width();
+                $('#handleRight').data('min', $('#handleMid').data('percent') + handleRadiusPercent * 100);
+                // store % distance to middle handle
+                let fromMid = ($('#handleRight').data('percent') - $('#handleMid').data('percent')) / (100 - $('#handleMid').data('percent'));
+                $('#handleRight').data('fromMid', fromMid);
+
+                update_preview_gradient();
+            }
+        });
+        stopSlider.addHandle({
+            id: 'handleMid',
+            value: 50,
+            change: function() {
+                if (!$('#handleLeft').data('fromLeft')) {
+                    let fromLeft = $('#handleLeft').data('percent') / $('#handleMid').data('percent');
+                    $('#handleLeft').data('fromLeft', fromLeft);
+                }
+                let percent = $('#handleMid').data('percent') * $('#handleLeft').data('fromLeft');
+                $('#handleLeft').css('left', percent + '%');
+                $('#handleLeft').data('percent', percent);
+
+                if (!$('#handleRight').data('fromMid')) {
+                    let fromMid = ($('#handleRight').data('percent') - $('#handleMid').data('percent')) / (100 - $('#handleMid').data('percent'));
+                    $('#handleRight').data('fromMid', fromMid);
+                }
+                percent = $('#handleMid').data('percent') + $('#handleRight').data('fromMid') * (100 - $('#handleMid').data('percent'));
+                $('#handleRight').css('left', percent + '%');
+                $('#handleRight').data('percent', percent);
+
+                update_preview_gradient();
+            }
+        });
+    }
+
     var main = () => {
-        slider = new GradientSlider('slider', update_preview_gradient);
+        setup_stop_slider();
         // RGB Color Pickers
         $('#colorA').minicolors({
             control: 'hue',
