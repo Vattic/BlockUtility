@@ -44,16 +44,11 @@ figure {
 }
 
 /* color stop slider */
-
-/* #stopSlider::before {
-    background-color: rgb(38, 38, 38);
-    border-radius: 1rem;
-} */
-
 #stopSlider::after {
     background-image: var(--previewGradient);
     outline: solid 0.35rem rgb(38, 38, 38);
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15);
+    /* height: 1rem !important; */
 }
 
 #stopSlider handle {
@@ -97,7 +92,7 @@ ul#gradientControls {
     margin: 0;
     padding: 0;
     flex-wrap: wrap;
-    padding: 0.5rem 0.4rem;
+    padding: 0.5rem 0.4rem 0.9rem;
 }
 
 /* gradient controls */
