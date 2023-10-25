@@ -6,7 +6,7 @@ class Slider {
      * @param {*} max Maximum slider value, defaults to 100
      * @param {*} step Size of each interval between min and max
      */
-    constructor(elementID, min = 0, max = 100, step = 1) {
+    constructor(elementID, min = 0, max = 100, step = 1, showInput = false) {
         this.draggedElement = false;
         this.dragOffset = 0;
         this.range = {
@@ -14,6 +14,7 @@ class Slider {
             'max': max
         }
         this.step = step;
+        this.showInput = showInput;
         this.container = $('#' + elementID);
         if (!this.container) { throw new Error('No element found with id ' + elementID); }
 
@@ -89,7 +90,14 @@ class Slider {
             $(handle).data(attributeName, data[attributeName]);
         }
         this.container.append(handle);
+        // add text input to each slider
+        // if (this.showInput){
+        //     let input = $('<input>', {
 
+        //     });
+        //     this.container.append(input);
+        // }
+        
         var self = this;
 
         $(handle).on('mousedown touchstart', function(evt) {

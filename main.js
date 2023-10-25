@@ -333,9 +333,12 @@ var GradientGen = (function() {
     var colorZ = new Color('rgb', 48, 255, 82);
     var textureBeingPicked;
     var stopSlider;
+    var hueSlider;
+    var saturationSlider;
+    var lightnessSlider;
 
     /**
-     * Converts rgb values into CSS color definition
+     * Converts rgb lightnesss into CSS color definition
      * @param {*} _args Either Array [r, g, b], or 3 arguments r, g, b. Numbers between 0-255
      * @returns String "rgb(r, g, b)"
      */
@@ -590,8 +593,59 @@ var GradientGen = (function() {
         });
     }
 
+    var update_color_picker = () => {
+        let hue = hueSlider.handle_value('hueHandle');
+        let saturation = $('#saturationHandle').data('percent');
+        let lightness = $('#lightnessHandle').data('percent');
+        // generate background gradients
+        let hueGradient = 'linear-gradient(to right, ';
+        let saturationGradient = 'linear-gradient(to right, ';
+        let lightnessGradient = 'linear-gradient(to right, ';
+        for (let i = 0; i <= 360; i+=10) {
+            hueGradient += `hsl(${i}, ${saturation}%, ${lightness}%), `
+            let percent = i / 360 * 100;
+            saturationGradient += `hsl(${hue}, ${percent}%, ${lightness}%), `
+            lightnessGradient += `hsl(${hue}, ${saturation}%, ${percent}%), `
+        }
+        root.style.setProperty('--hueGradient', hueGradient.slice(0, -2));
+        root.style.setProperty('--saturationGradient', saturationGradient.slice(0, -2));
+        root.style.setProperty('--lightnessGradient', lightnessGradient.slice(0, -2));
+        // set slider handle colors
+        root.style.setProperty('--pickerColor', `hsl(${hue}, ${saturation}%, ${lightness}%)`);
+    }
+    // 336, 79%, 41%
+    var setup_hsv_sliders = () => {
+        hueSlider = new Slider('hueSlider', 0, 360, 1, true);
+        saturationSlider = new Slider('saturationSlider', 0, 100, 1, true);
+        lightnessSlider = new Slider('lightnessSlider', 0, 100, 1, true);
+        hueSlider.addHandle({
+            id: 'hueHandle',
+            value: 336,
+            change: function() {
+                update_color_picker();
+            }
+        });
+        saturationSlider.addHandle({
+            id: 'saturationHandle',
+            value: 79,
+            change: function() {
+                update_color_picker();
+            }
+        });
+        lightnessSlider.addHandle({
+            id: 'lightnessHandle',
+            value: 41,
+            change: function() {
+                update_color_picker();
+            }
+        });
+
+        update_color_picker();
+    }
+
     var main = () => {
         setup_stop_slider();
+        setup_hsv_sliders();
         // RGB Color Pickers
         $('#colorA').minicolors({
             control: 'hue',
