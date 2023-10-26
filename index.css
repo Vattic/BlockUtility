@@ -91,7 +91,7 @@ wrapper {
 #colorPicker {
     display: flex;
     z-index: 10;
-    padding-top: 0.4rem;
+    padding-top: 1.4rem;
 }
 
 #colorPreview {

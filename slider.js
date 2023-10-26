@@ -25,6 +25,7 @@ class Slider {
         if (this.showInput){
             let input = $('<input>', {
                 type: 'number',
+                inputmode: 'decimal',
                 autocomplete: 'off',
                 spellcheck: 'off'
             });
