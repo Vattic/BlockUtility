@@ -16,7 +16,7 @@
 }
 
 .withInput {
-    margin-right: calc(var(--handleWidth) / 2 + var(--inputBuffer));
+    margin-right: calc(var(--handleWidth) / 1.5 + var(--inputBuffer));
 }
 
 .slider::after {
@@ -63,10 +63,10 @@ handle {
 
 .slider input {
     position: absolute;
-    left: calc(100% + var(--handleWidth) / 2);
+    left: calc(100% + var(--handleWidth) / 1.5);
     width: 3ch;
     align-self: center;
     -webkit-appearance: none;
     -moz-appearance: textfield;
-    
+    text-align: right;
 }

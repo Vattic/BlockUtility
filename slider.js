@@ -30,7 +30,9 @@ class Slider {
                 spellcheck: 'off'
             });
             this.container.append(input);
-        }
+            // delays update until user stops typing in text input
+            this.timeout;
+        }   
     }
 
     clamp = (num, min, max) => Math.min(Math.max(num, min), max);
@@ -152,7 +154,34 @@ class Slider {
             self.draggedElement = false;
         });
 
-        $(handle).parent().find('input').on('keyup wheel', function() {
+        $(handle).parent().find('input').on('keyup', function() {
+            let input = this;
+            clearTimeout(self.timeout);
+            self.timeout = setTimeout(function() {
+                let value = $(input).val();
+                let percent = self.value_to_percent(value);
+                percent = self.clamp(percent, $(handle).data('min'), $(handle).data('max'));
+                // animate handle movement to new value
+                $(handle).animate({
+                    left: percent + '%',
+                }, {
+                    duration: 800,
+                    easing: 'swing',
+                    // updates handle as if it is being dragged
+                    step: function() {
+                        let style = $(handle).attr('style');
+                        const regexLeft = /left: ([\d.]*)%/;
+                        let leftPercent = Number(style.match(regexLeft)[1]);
+                        $(handle).data('percent', leftPercent);
+                        $(handle).data('change')();
+                    }
+                });
+                // TODO: validation
+                $(input).val(self.percent_to_value(percent));
+            }, 400);
+        });
+
+        $(handle).parent().find('input').on('wheel', function() {
             let value = $(this).val();
             let percent = self.value_to_percent(value);
             percent = self.clamp(percent, $(handle).data('min'), $(handle).data('max'))
