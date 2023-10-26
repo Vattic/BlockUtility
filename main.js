@@ -58,12 +58,12 @@ var Utility = (function() {
 
 
 class Color {
-    #rgb;
+    #hsl;
     #lch;
     /**
      * Constructor for Color object
      * - 'new Color(colorSpace, coordinates)'
-     * - 'new Color('rgb', r, g, b)'
+     * - 'new Color('hsl', h, s, l)'
      * - 'new Color('lch', l, c, h)'
      * coordinates can also be an Array of Numbers with length 3
      */
@@ -80,26 +80,26 @@ class Color {
                 coordinates = arguments[1];
         }
 
-        if (arguments[0] == 'rgb') {
-            this.#rgb = coordinates;
+        if (arguments[0] == 'hsl') {
+            this.#hsl = coordinates;
         }
         else if (arguments[0] == 'lch') {
             this.#lch = coordinates;
         }
     }
 
-    get rgb() {
+    get hsl() {
         // if not already converted then convert and store
-        if (typeof this.#rgb == 'undefined') {
-            this.#rgb = this.#convertLch2RGB(this.#lch);
+        if (typeof this.#hsl == 'undefined') {
+            this.#hsl = this.#convertLch2HSL(this.#lch);
         }
-        return this.#rgb;
+        return this.#hsl;
     }
 
     get lch() {
         // if not already converted then convert and store
         if (typeof this.#lch == 'undefined') {
-            this.#lch = this.#convertRGB2Lch(this.#rgb);
+            this.#lch = this.#convertHSL2Lch(this.#hsl);
         }
         return this.#lch;
     }
@@ -160,6 +160,88 @@ class Color {
         }
         let h = Utility.lerp(colorA.h, colorZ.h, p) % 360;
         return new Color('lch', l, c, h);
+    }
+
+    /**
+     * Convert color from HSL to RGB color space,
+     * based on http://www.easyrgb.com/index.php?X=MATH
+     * @param {[Number, Number, Number]} hsl Array of [hue, saturation, and lightness] values in HSL color space hue (0 - 360), saturation and lightness (0 - 100)
+     * @returns {[Number, Number, Number]} Array of [r, g, b] values in RGB color space (0 - 255)
+     */
+    #convertHSL2RGB(hsl) {
+        let hue2rgb = function(v1, v2, vH) {
+            if (vH < 0) { vH += 1; }
+            if (vH > 1) { vH -= 1; }
+            if (6 * vH < 1) { return v1 + (v2 - v1) * 6 * vH; }
+            if (2 * vH < 1) { return v2; }
+            if (3 * vH < 2) { return v1 + (v2 - v1) * ((2 / 3) - vH) * 6; }
+            return v1;
+        }
+
+        let [h, s, l] = hsl;
+        h = Utility.normalise(h, 0, 360, 0, 1);
+        [s, l] = Utility.normalise([s, l], 0, 100, 0, 1);
+
+        let r, g, b;
+
+        if ( s == 0 ) {                       //HSL from 0 to 1
+            r = l * 255;                      //RGB results from 0 to 255
+            g = l * 255;
+            b = l * 255;
+        }
+        else {
+            let var_2;
+            if ( l < 0.5 ) { var_2 = l * (1 + s); }
+            else           { var_2 = (l + s) - (s * l); }
+
+            let var_1 = 2 * l - var_2;
+
+            r = 255 * hue2rgb(var_1, var_2, h + (1 / 3));
+            g = 255 * hue2rgb(var_1, var_2, h);
+            b = 255 * hue2rgb(var_1, var_2, h - (1 / 3));
+        }
+        return [r, g, b];
+    }
+
+    /**
+     * Convert color from RGB to HSL color space,
+     * based on http://www.easyrgb.com/index.php?X=MATH
+     * @param {[Number, Number, Number]} rgb Array of [r, g, b] values in RGB color space (0 - 255)
+     * @returns {[Number, Number, Number]} Array of [hue, saturation, and lightness] values in HSL color space hue (0 - 360), saturation and lightness (0 - 100)
+     */
+    #convertRGB2HSL(rgb) {
+        let [r, g, b] = Utility.normalise(rgb, 0, 255, 0, 1);
+
+        let var_Min = Math.min(r, g, b);            //Min. value of RGB
+        let var_Max = Math.max(r, g, b);            //Max. value of RGB
+        let del_Max = var_Max - var_Min;            //Delta RGB value
+
+        let l = (var_Max + var_Min) / 2;
+        let h, s;
+        if (del_Max == 0) {                         //This is a gray, no chroma...
+            
+            h = 0;                                  //HSL results from 0 to 1
+            s = 0;
+        }
+        else {                                      //Chromatic data...
+            
+            if (l < 0.5) { s = del_Max / (var_Max + var_Min); }
+            else         { s = del_Max / (2 - var_Max - var_Min); }
+
+            let del_R = (((var_Max - r) / 6) + (del_Max / 2)) / del_Max;
+            let del_G = (((var_Max - g ) / 6) + (del_Max / 2 )) / del_Max;
+            let del_B = (((var_Max - b ) / 6) + (del_Max / 2 )) / del_Max;
+
+            if      (r == var_Max) { h = del_B - del_G; }
+            else if (g == var_Max) { h = (1 / 3) + del_R - del_B; }
+            else if (b == var_Max) { h = (2 / 3) + del_G - del_R; }
+
+            if ( h < 0 ) { h += 1; }
+            if ( h > 1 ) { h -= 1; }
+        }
+        h = Utility.normalise(h, 0, 1, 0, 360);
+        [s, l] = Utility.normalise([s, l], 0, 1, 0, 100);
+        return [h, s, l];
     }
 
     /**
@@ -304,23 +386,23 @@ class Color {
     }
 
     /**
-     * Convert color from RGB to CIELChab color space,
+     * Convert color from HSL to CIELChab color space,
      * based on http://www.easyrgb.com/index.php?X=MATH
-     * @param {[Number, Number, Number]} rgb Array of [r, g, b] values in RGB color space (0-255)
+     * @param {[Number, Number, Number]} hsl Array of [h, s, l] values in h (0 - 360), s and l (0 - 100)
      * @returns {[Number, Number, Number]} Array of [l, c, h] values in CIELChab color space
      */
-    #convertRGB2Lch(rgb) {
-        return this.#convertLab2Lch(this.#convertXYZ2Lab((this.#convertRGB2XYZ(rgb))));
+    #convertHSL2Lch(hsl) {
+        return this.#convertLab2Lch(this.#convertXYZ2Lab((this.#convertRGB2XYZ(this.#convertHSL2RGB(hsl)))));
     }
 
     /**
-     * Convert color from CIELChab to RGB color space,
+     * Convert color from CIELChab to HSL color space,
      * based on http://www.easyrgb.com/index.php?X=MATH
      * @param {[Number, Number, Number]} lch Array of [l, c, h] values in CIELChab color space
-     * @returns {[Number, Number, Number]} Array of [r, g, b] values in RGB color space (0-255)
+     * @returns {[Number, Number, Number]} Array of [h, s, l] values in h (0 - 360), s and l (0 - 100)
      */
-    #convertLch2RGB(lch) {
-        return this.#convertXYZ2RGB(this.#convertLab2XYZ(this.#convertLch2Lab(lch)));
+    #convertLch2HSL(lch) {
+        return this.#convertRGB2HSL(this.#convertXYZ2RGB(this.#convertLab2XYZ(this.#convertLch2Lab(lch))));
     }
 }
 
@@ -329,8 +411,8 @@ var GradientGen = (function() {
     var root = document.querySelector(':root');
     var blockA;
     var blockZ;
-    var colorA = new Color('rgb', 189, 22, 88);
-    var colorZ = new Color('rgb', 48, 255, 82);
+    var colorA = new Color('hsl', 336, 79, 41);
+    var colorZ = new Color('hsl', 130, 100, 59);
     var textureBeingPicked;
     var stopSlider;
     var hueSlider;
@@ -338,28 +420,28 @@ var GradientGen = (function() {
     var lightnessSlider;
 
     /**
-     * Converts rgb value into CSS color definition
-     * @param {*} _args Either Array [r, g, b], or 3 arguments r, g, b. Numbers between 0-255
-     * @returns String "rgb(r, g, b)"
+     * Converts hsl value into CSS color definition
+     * @param {*} _args Either Array [h, s, l], or 3 arguments h, s, l. h (0 - 360), s and l (0 - 100)
+     * @returns String "hsl(h, s%, l%)"
      */
-    var rgb_2_css = function(_args) {
-        let r, g, b;
+    var hsl_2_css = function(_args) {
+        let h, s, l;
         if (arguments.length === 1) {
-            [r, g, b] = arguments[0];
+            [h, s, l] = arguments[0];
         }
         else {
-            [r, g, b] = arguments;
+            [h, s, l] = arguments;
         }
-        return `rgb(${r}, ${g}, ${b})`;
+        return `hsl(${h}, ${s}%, ${l}%)`;
     }
 
     /**
-     * Converts CSS color definition into Array of rgb values
-     * @param {String} cssString String in format "rgb(r, g, b)"
-     * @returns Array [r, g, b]
+     * Converts CSS color definition into Array of hsl values
+     * @param {String} cssString String in format "hsl(h, s%, l%)"
+     * @returns Array [h, s, l]
      */
-    var css_2_rgb = function(cssString) {
-        return cssString.replace('rgb(', '').replace(')', '').split(', ').map(Number);
+    var css_2_hsl = function(cssString) {
+        return cssString.replace('hsl(', '').replace(')', '').replace('%', '').split(', ').map(Number);
     }
 
     /**
@@ -409,21 +491,21 @@ var GradientGen = (function() {
         let gradientSteps = sample_gradient(50);
         let gradientString = 'linear-gradient(90deg, ';
         for (const color of gradientSteps) {
-            gradientString += rgb_2_css(color.rgb) + ', ';
+            gradientString += hsl_2_css(color.hsl) + ', ';
         }
-        root.style.setProperty('--previewGradient', gradientString.slice(0, -2));
+        root.style.setProperty('--previewGradient', gradientString.slice(0, -2) + ')');
         // set the handle colors
         let handleColor = colorA.lerp_with(shortPath, colorZ, 0.5);
-        root.style.setProperty('--midHandleColor', rgb_2_css(handleColor.rgb));
+        root.style.setProperty('--midHandleColor', hsl_2_css(handleColor.hsl));
         handleColor = colorA.lerp_with(shortPath, colorZ, 0.25);
-        root.style.setProperty('--leftHandleColor', rgb_2_css(handleColor.rgb));
+        root.style.setProperty('--leftHandleColor', hsl_2_css(handleColor.hsl));
         handleColor = colorA.lerp_with(shortPath, colorZ, 0.75);
-        root.style.setProperty('--rightHandleColor', rgb_2_css(handleColor.rgb));
+        root.style.setProperty('--rightHandleColor', hsl_2_css(handleColor.hsl));
     }
 
     var update_minicolors = () => {
-        $('#colorA').minicolors('value', rgb_2_css(colorA.rgb));
-        $('#colorZ').minicolors('value', rgb_2_css(colorZ.rgb));
+        $('#colorA').minicolors('value', hsl_2_css(colorA.hsl));
+        $('#colorZ').minicolors('value', hsl_2_css(colorZ.hsl));
     }
 
     var random_texture = () => {
@@ -438,13 +520,13 @@ var GradientGen = (function() {
         }
         colorA = new Color('lch', textureA.averageColor);
         colorZ = new Color('lch', textureZ.averageColor);
-        update_minicolors();
+        // update_minicolors();
     }
 
     var swap = () => {
         [blockA, blockZ] = [blockZ, blockA];
         [colorA, colorZ] = [colorZ, colorA];
-        update_minicolors();
+        // update_minicolors();
         update_preview_gradient();
     }
 
@@ -613,7 +695,7 @@ var GradientGen = (function() {
         // set slider handle colors
         root.style.setProperty('--pickerColor', `hsl(${hue}, ${saturation}%, ${lightness}%)`);
     }
-    // 336, 79%, 41%
+    
     var setup_hsv_sliders = () => {
         hueSlider = new Slider('hueSlider', 0, 360, 1, true);
         saturationSlider = new Slider('saturationSlider', 0, 100, 1, true);
@@ -647,26 +729,26 @@ var GradientGen = (function() {
         setup_stop_slider();
         setup_hsv_sliders();
         // RGB Color Pickers
-        $('#colorA').minicolors({
-            control: 'hue',
-            format: 'rgb',
-            defaultValue: rgb_2_css(colorA.rgb),
-            position: 'bottom left',
-            change: function(rgb) {
-                colorA = new Color('rgb', css_2_rgb(rgb));
-                update_preview_gradient();
-            }
-        });
-        $('#colorZ').minicolors({
-            control: 'hue',
-            format: 'rgb',
-            defaultValue: rgb_2_css(colorZ.rgb),
-            position: 'bottom right',
-            change: function(rgb) {
-                colorZ = new Color('rgb', css_2_rgb(rgb));
-                update_preview_gradient();
-            }
-        });
+        // $('#colorA').minicolors({
+        //     control: 'hue',
+        //     format: 'hsl',
+        //     defaultValue: hsl_2_css(colorA.hsl),
+        //     position: 'bottom left',
+        //     change: function(hsl) {
+        //         colorA = new Color('hsl', css_2_hsl(hsl));
+        //         update_preview_gradient();
+        //     }
+        // });
+        // $('#colorZ').minicolors({
+        //     control: 'hue',
+        //     format: 'hsl',
+        //     defaultValue: hsl_2_css(colorZ.hsl),
+        //     position: 'bottom right',
+        //     change: function(hsl) {
+        //         colorZ = new Color('hsl', css_2_hsl(hsl));
+        //         update_preview_gradient();
+        //     }
+        // });
 
         $(document).on('click', '#randomiseButton', randomise_textures);
         $(document).on('click', '#swapButton', swap);
