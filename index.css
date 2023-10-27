@@ -112,6 +112,7 @@ wrapper {
 
 #sliders {
     flex: 1 1 auto;
+    padding-right: 2ch;
 }
 
 #colorPicker .slider {
