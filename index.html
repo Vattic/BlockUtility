@@ -17,18 +17,16 @@
 <!-- <a href="http://github" id="sourceLink">
     <i class="fa-brands fa-github" style="color: #ffffff;"></i>Source on Github
 </a> -->
+
 <wrapper>
     
-    <div id="gradientBox">
-        <div id="slider"></div>
-        <figure id="gradientPreview"></figure>
-    </div>
+    <figure id="gradientPreview">
+        <!-- <button></button>
+        <button></button> -->
+    </figure>
     <ul id="gradientControls">
         <li>
-            <button id="textureButtonA">
-                <img src="./icon/block.svg" alt="open texture menu" id="startBlockSelect" class="blockIcon"/>
-            </button>
-            <input type="text" id="colorA" class="colorSelector" autocomplete="off" spellcheck="false">    
+            <input type="hidden" id="colorA" class="colorSelector" autocomplete="off" spellcheck="false">    
         </li>
         <li id="centerControls">
             <button id="pathButton">
@@ -42,26 +40,39 @@
             </button>
         </li>
         <li>
-            <input type="text" id="colorZ" class="colorSelector" autocomplete="off" spellcheck="false">
-            <button id="textureButtonZ">
-                <img src="./icon/block.svg" alt="open texture menu" id="stopBlockSelect" class="blockIcon"/>
-            </button>
+            <input type="hidden" id="colorZ" class="colorSelector" autocomplete="off" spellcheck="false">
         </li>
     </ul>
+    <div id="stopSlider"></div>
 
-    <div id="textureMenu">
-        <h2>Select a texture</h2>
-        <button id="textureMenuCloseButton">
-            <img src="./icon/close.svg" alt="close texture menu" />
-        </button>
-        <div id="textureMenuWrapper"></div>
+    <div id="colorPicker">
+        <div id="colorPreview"></div>
+        <div id="sliders">
+            <div id="hueSlider"></div>
+            <div id="saturationSlider"></div>
+            <div id="lightnessSlider"></div>
+        </div>
     </div>
-
-    <div id="tooltip">n/a</div>
+    
 </wrapper>
+
+
+
+<div id="texturePicker">
+    <h2>Select a texture</h2>
+    <button id="texturePickerCloseButton">
+        <img src="./icon/close.svg" alt="close texture picker" />
+    </button>
+    <div id="texturePickerWrapper"></div>
+</div>
+
+<div id="tooltip">n/a</div>
 
 <!-- jQuery etc. -->
 <script src="jquery-3.7.0.min.js"></script>
+<!-- Slider -->
+<script src="slider.js"></script>
+<link rel="stylesheet" href="slider.css">
 <!-- MiniColors -->
 <script src="./MiniColors/jquery.minicolors.js"></script>
 <link rel="stylesheet" href="./MiniColors/jquery.minicolors.css">
