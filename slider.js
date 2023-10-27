@@ -127,7 +127,7 @@ class Slider {
         $(document).on('mousemove touchmove', function(evt) {
             if (self.draggedElement) {
                 // get dragging to work on touch devices
-                if (evt.type === 'touchstart') { evt = evt.touches[0] };
+                if (evt.type === 'touchmove') { evt = evt.touches[0] };
                 // current mouse position relative to the slider parent container
                 let newX = evt.pageX - self.container.offset().left;
                 // handle offset relative to where it is grabbed
