@@ -23,6 +23,8 @@ html {
 
 input {
     font: inherit;
+    font-size: 115%;
+    font-weight: 600;
     letter-spacing: inherit;
     color: inherit;
     background-color: var(--backgroundBlack) !important;
@@ -92,6 +94,12 @@ wrapper {
     display: flex;
     z-index: 10;
     padding-top: 1.4rem;
+    /* width: calc(100% - 2rem);
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 1rem;
+    background-color: var(--standardGray); */
 }
 
 #colorPreview {

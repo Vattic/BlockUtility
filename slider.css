@@ -9,14 +9,14 @@
 .slider {
     display: flex;
     position: relative;
-    margin-left: calc(var(--handleWidth) / 2); /* stops the handles from extending beyond edges */
-    margin-right: calc(var(--handleWidth) / 2);
+    margin-left: calc(var(--handleWidth) / 1.8); /* stops the handles from extending beyond edges */
+    margin-right: calc(var(--handleWidth) / 1.8);
     height: var(--handleHeight);
     overflow: visible;
 }
 
 .withInput {
-    margin-right: calc(var(--handleWidth) / 1.5 + var(--inputBuffer));
+    margin-right: calc(var(--handleWidth) / 1.8 + var(--inputBuffer));
 }
 
 .slider::after {
