@@ -127,40 +127,6 @@ class Color {
     set h(n) {
         this.#lch[2] = n;
     }
-    /**
-     * Linear Interpolation between this color and a given color in lch color space
-     * @param {Boolean} shortPath direction of interpolation of the angle h
-     * @param {Color} colorZ second color
-     * @param {Number} p percentage as [0-1] with 0.5 being 50%
-     * @returns {Color} color p% between this color and given color
-     */
-    lerp_with(shortPath, colorZ, p) {
-        let colorA = this;
-        let l = Utility.lerp(colorA.l, colorZ.l, p);
-        let c = Utility.lerp(colorA.c, colorZ.c, p);
-
-        let d = colorZ.h - colorA.h;
-        if (shortPath == true) {
-            if (d > 180) {
-                colorA.h += 360;
-            }
-            else if (d < -180) {
-                colorZ.h += 360;
-            }
-        }
-        else {
-            if (d > -180 && d < 180) {
-                if (d > 0) {
-                    colorA.h += 360;
-                }
-                else {
-                    colorZ.h += 360;
-                }
-            }
-        }
-        let h = Utility.lerp(colorA.h, colorZ.h, p) % 360;
-        return new Color('lch', l, c, h);
-    }
 
     /**
      * Convert color from HSL to RGB color space,
@@ -200,6 +166,9 @@ class Color {
             g = 255 * hue2rgb(var_1, var_2, h);
             b = 255 * hue2rgb(var_1, var_2, h - (1 / 3));
         }
+        r = Math.floor(r);
+        g = Math.floor(g);
+        b = Math.floor(b);
         return [r, g, b];
     }
 
@@ -241,6 +210,9 @@ class Color {
         }
         h = Utility.normalise(h, 0, 1, 0, 360);
         [s, l] = Utility.normalise([s, l], 0, 1, 0, 100);
+        h = Math.floor(h);
+        s = Math.floor(s);
+        l = Math.floor(l);
         return [h, s, l];
     }
 
@@ -419,6 +391,52 @@ var GradientGen = (function() {
     var saturationSlider;
     var lightnessSlider;
 
+
+    /**
+     * Linear Interpolation between two colors in lch color space
+     * @param {Color} colorA first color
+     * @param {Color} colorZ second color
+     * @param {Boolean} shortPath direction of interpolation of the angle h
+     * @param {Number} p percentage as [0-1] with 0.5 being 50%
+     * @returns {Color} color p% between this color and given color
+     */
+    var lerp_colors = function(colorA, colorZ, shortPath, p) {
+        let a = {
+            'l': colorA.l,
+            'c': colorA.c,
+            'h': colorA.h
+        }
+        let z = {
+            'l': colorZ.l,
+            'c': colorZ.c,
+            'h': colorZ.h
+        }
+        let l = Utility.lerp(a.l, z.l, p);
+        let c = Utility.lerp(a.c, z.c, p);
+
+        let d = z.h - a.h;
+        if (shortPath) {
+            if (d > 180) {
+                a.h += 360;
+            }
+            else if (d < -180) {
+                z.h += 360;
+            }
+        }
+        else {
+            if (d > -180 && d < 180) {
+                if (d > 0) {
+                    a.h += 360;
+                }
+                else {
+                    z.h += 360;
+                }
+            }
+        }
+        let h = Utility.lerp(a.h, z.h, p) % 360;
+        return new Color('lch', l, c, h);
+    }
+
     /**
      * Converts hsl value into CSS color definition
      * @param {*} _args Either Array [h, s, l], or 3 arguments h, s, l. h (0 - 360), s and l (0 - 100)
@@ -455,7 +473,7 @@ var GradientGen = (function() {
         for (let n = 1; n < sampleNumber-1; n++) {
             let p = n / sampleNumber;
             p = get_percent(p);
-            samples.push(colorA.lerp_with(shortPath, colorZ, p));
+            samples.push(lerp_colors(colorA, colorZ, shortPath, p));
         }
         samples.push(colorZ);
         return samples;
@@ -495,11 +513,11 @@ var GradientGen = (function() {
         }
         root.style.setProperty('--previewGradient', gradientString.slice(0, -2) + ')');
         // set the handle colors
-        let handleColor = colorA.lerp_with(shortPath, colorZ, 0.5);
+        let handleColor = lerp_colors(colorA, colorZ, shortPath, 0.5);
         root.style.setProperty('--midHandleColor', hsl_2_css(handleColor.hsl));
-        handleColor = colorA.lerp_with(shortPath, colorZ, 0.25);
+        handleColor = lerp_colors(colorA, colorZ, shortPath, 0.25);
         root.style.setProperty('--leftHandleColor', hsl_2_css(handleColor.hsl));
-        handleColor = colorA.lerp_with(shortPath, colorZ, 0.75);
+        handleColor = lerp_colors(colorA, colorZ, shortPath, 0.75);
         root.style.setProperty('--rightHandleColor', hsl_2_css(handleColor.hsl));
     }
 
@@ -694,8 +712,10 @@ var GradientGen = (function() {
         root.style.setProperty('--lightnessGradient', lightnessGradient.slice(0, -2));
         // set slider handle colors
         root.style.setProperty('--pickerColor', `hsl(${hue}, ${saturation}%, ${lightness}%)`);
+        colorA = new Color('hsl', hue, saturation, lightness);
+        update_preview_gradient();
     }
-    
+
     var setup_hsv_sliders = () => {
         hueSlider = new Slider('hueSlider', 0, 360, 1, true);
         saturationSlider = new Slider('saturationSlider', 0, 100, 1, true);
