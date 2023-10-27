@@ -210,9 +210,9 @@ class Color {
         }
         h = Utility.normalise(h, 0, 1, 0, 360);
         [s, l] = Utility.normalise([s, l], 0, 1, 0, 100);
-        h = Math.floor(h);
-        s = Math.floor(s);
-        l = Math.floor(l);
+        h = Number(h.toFixed(4));
+        s = Number(s.toFixed(4));
+        l = Number(l.toFixed(4));
         return [h, s, l];
     }
 
@@ -538,6 +538,7 @@ var GradientGen = (function() {
         }
         colorA = new Color('lch', textureA.averageColor);
         colorZ = new Color('lch', textureZ.averageColor);
+        update_preview_gradient();
         // update_minicolors();
     }
 
