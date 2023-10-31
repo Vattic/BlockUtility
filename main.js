@@ -283,19 +283,19 @@ var GradientGen = (function() {
             // hue gradient
             let intermediate = hueGradient(percent);
             intermediate = get_rgb_css(intermediate);
-            hueGradient += intermediate + ', '
+            hueGradientCSS += intermediate + ', '
             // chroma gradient
             intermediate = chromaGradient(percent);
             intermediate = get_rgb_css(intermediate);
-            chromaGradient += intermediate + ', '
+            chromaGradientCSS += intermediate + ', '
             // lightness gradient
             intermediate = lightnessGradient(percent);
             intermediate = get_rgb_css(intermediate);
-            lightnessGradient += intermediate + ', '
+            lightnessGradientCSS += intermediate + ', '
         }
-        hueGradientCSS = hueGradient.slice(0, -2) + ')';
-        chromaGradientCSS = chromaGradient.slice(0, -2) + ')';
-        lightnessGradientCSS = lightnessGradient.slice(0, -2) + ')';
+        hueGradientCSS = hueGradientCSS.slice(0, -2) + ')';
+        chromaGradientCSS = chromaGradientCSS.slice(0, -2) + ')';
+        lightnessGradientCSS = lightnessGradientCSS.slice(0, -2) + ')';
         root.style.setProperty('--hueGradient', hueGradientCSS);
         root.style.setProperty('--chromaGradient', chromaGradientCSS);
         root.style.setProperty('--lightnessGradient', lightnessGradientCSS);
