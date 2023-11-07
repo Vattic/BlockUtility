@@ -125,8 +125,11 @@ wrapper {
     border-image: linear-gradient(90deg, rgba(0,0,0,0) 0.75rem, rgba(0,0,0,15%) 0.75rem, rgba(0,0,0,15%) calc(100% - 0.75rem), rgba(0,0,0,0) calc(100% - 0.75rem)) 1;
     box-sizing: border-box;
 }
-#stopSlider #handleLeft, #stopSlider #handleRight, #stopSlider #handleMid {
+#stopSlider #handleLeft, #stopSlider #handleRight {
     z-index: 6 !important;
+}
+#stopSlider #handleMid {
+    z-index: 7 !important;
 }
 
 /* color picker */

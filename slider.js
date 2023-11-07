@@ -1,227 +1,301 @@
 class Slider {
-    /**
-     * 
-     * @param {String} elementID String of html element id to become slider
-     * @param {Number} min Minimum slider value, defaults to 0
-     * @param {*} max Maximum slider value, defaults to 100
-     * @param {*} step Size of each interval between min and max
-     */
-    constructor(elementID, min = 0, max = 100, step = 1, showInput = false) {
-        this.draggedElement = false;
-        this.dragOffset = 0;
+    constructor(
+        elementID,
+        min = 0, max = 100,
+        step = 1,
+        showInput = false,
+        clickJump = true
+    ) {
+        this.container = $('#' + elementID);
+        if (!this.container.length) { throw new Error('No element found with id ' + elementID); }
+        this.selectedHandle = false;
+        this.grabOffset = 0;
         this.range = {
             'min': min,
             'max': max
         }
         this.step = step;
-        this.showInput = showInput;
-        this.container = $('#' + elementID);
-        if (!this.container) { throw new Error('No element found with id ' + elementID); }
+        this.clickJump = clickJump;
 
         this.container.addClass('slider');
-
         this.container.append($('<div>', { class: 'bar' }));
-
         //add text input to each slider
-        if (this.showInput){
+        this.showInput = showInput;
+        if (showInput){
             this.container.addClass('withInput');
-            let input = $('<input>', {
+            this.container.append($('<input>', {
                 type: 'number',
                 inputmode: 'decimal',
                 autocomplete: 'off',
                 spellcheck: 'off'
-            });
-            this.container.append(input);
+            }));
             // delays update until user stops typing in text input
             this.timeout;
-        }   
+        }
+        if (clickJump) {
+            this.container.addClass('clickJump');
+        }
     }
 
     clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
-    get_handle() {
-        let handle;
-        if (arguments.length == 0) {
-            handle = $(this.container).find('handle');
-        }
-        else {
-            handle = arguments[0];
-        }
-        if (typeof handle === 'string'){
-            handle = $('#' + handle);
-        }
-        return handle;
+    roundToNearest(numToRound, numToRoundTo) {
+        numToRoundTo = 1 / (numToRoundTo);
+    
+        return Math.round(numToRound * numToRoundTo) / numToRoundTo;
     }
-    /**
-     * 
-     * @param {*} value 
-     * @param args
-     */
-    set_value(value) {
-        let handle;
-        if (!arguments[1]) {
-            handle = this.get_handle();
-        }
-        else {
-            handle = this.get_handle(arguments[1]);
-        }
-        let percent = this.value_to_percent(value);
-        $(handle).data('percent', percent);
-        $(handle).css('left', percent + '%');
-        $(handle).data('change')();
-        $(this.container).find('input').val(Math.round(percent));
-    }
-    /**
-     * Get the value of a given handle
-     * @param {*} handle either nothing for single handle sliders, a string with html id of handle element, selected jquery element
-     * @returns {Number}
-     */
-    get_value() {
-        let handle = this.get_handle.apply(this, arguments);
 
-        let handlePercent = $(handle).data('percent');
-        let value = this.percent_to_value(handlePercent);
+    get_handle(handleID = undefined) {
+        if (typeof handleID === 'object') {
+            return handleID;
+        }
+        // if no handleID is given it finds the first handle in the slider
+        // this is useful for sliders with only one handle
+        if (handleID === undefined) {
+            let handle = $(this.container).find('handle');
+            if (!handle.length) { throw new Error('No handle within slider with ID ' + $(this.container).attr('id')); }
+            return handle;
+        }
+        else if (typeof handleID === 'string') {
+            let handle = $('#' + handleID);
+            if (!handle.length) { throw new Error('No handle found with id ' + handleID); }
+            return handle;
+        }
+        throw new Error('Unsupported arguments passed to \'get_handle\' must be undefined, a string of the handle element ID, or the selected handle element.');
+    }
+
+    get_input(input = undefined) {
+        if (input === undefined) {
+            input = $(this.container).find('input');
+        }
+        return input;
+    }
+
+    get_input_value(input) {
+        if (!this.showInput) { return; }
+        input = this.get_input(input);
+        let value = Number($(input).val());
         return value;
     }
-    /**
-     * Get value at given percent of slider range
-     * @param {Number} percent [0 - 100]
-     * @returns {Number} value [range.min - range.max]
-     */
+
+    get_value(handle = undefined) {
+        let percent = this.get_percent(handle);
+        let value = this.percent_to_value(percent);
+        return value;
+    }
+
+    set_input_value(value, input = undefined) {
+        if (!this.showInput) { return; }
+        input = this.get_input(input);
+        input.val(value);
+    }
+
+    set_value(value, animated = false, speed = 500, handle = undefined) {
+        handle = this.get_handle(handle);
+        value = this.roundToNearest(value, this.step);
+        // clamp to be within handle min and max
+        let handleRange = $(handle).data('range');
+        value = this.clamp(value,
+            handleRange.min,
+            handleRange.max
+        );
+        let percent = this.value_to_percent(value);
+        if (animated) {
+            this.animate_transition(handle, percent, speed);
+        }
+        else {
+            $(handle).css('left', percent + '%');
+        }
+        this.set_input_value(value);
+        $(handle).data('changed')();
+    }
+
+    get_percent(handle = undefined) {
+        handle = this.get_handle(handle);
+        let percent = handle.position().left / this.container.width() * 100;
+        return percent;
+    }
+
+    set_percent(percent, animated = false, speed = 500, handle = undefined) {
+        handle = this.get_handle(handle);
+        // clamp to be within handle min and max
+        let handleRange = $(handle).data('range');
+        percent = this.clamp(percent,
+            this.value_to_percent(handleRange.min),
+            this.value_to_percent(handleRange.max)
+        );
+        // clamp to be within 0 - 100%
+        percent = this.clamp(percent, 0, 100);
+        if (animated) {
+            this.animate_transition(handle, percent, speed);
+        }
+        else {
+            $(handle).css('left', percent + '%');
+        }
+        let value = this.percent_to_value(percent);
+        this.set_input_value(value);
+        $(handle).data('changed')();
+    }
+
+    set_handle_min(value, handle) {
+        handle = this.get_handle(handle);
+        let range = handle.data('range');
+        range.min = value;
+        handle.data('range', range);
+    }
+
+    set_handle_max(value, handle) {
+        handle = this.get_handle(handle);
+        let range = handle.data('range');
+        range.max = value;
+        handle.data('range', range);
+    }
+
+    set_handle_changed(fun, handle) {
+        handle = this.get_handle(handle);
+        handle.data('changed', fun);
+    }
+
+    set_handle_dragged(fun, handle) {
+        handle = this.get_handle(handle);
+        handle.data('dragged', fun);
+    }
+
+    value_to_percent(value) {
+        let percent = (value - this.range.min) / (this.range.max - this.range.min) * 100;
+        return percent;
+    }
+
     percent_to_value(percent) {
         let value = (this.range.max - this.range.min) * (percent / 100) + this.range.min;
         value = Math.round(value / this.step) * this.step;
         return value;
     }
-    /**
-     * Get percent of given value in slider range
-     * @param {Number} value [range.min - range.max]
-     * @returns {Number} percent [0 - 100]
-     */
-    value_to_percent(value) {
-        let percent = (value - this.range.min) / (this.range.max - this.range.min) * 100;
-        return percent;
-    }
-    /**
-     * Add a handle to the slider
-     * @param {Array} data Dictionary containing at least:
-     * 
-     * - id: unique id, used as html element id
-     * - value: starting value
-     * 
-     * optionally can include:
-     * - draggable: boolean, defaults to true
-     * - min: minimum bound, defaults to slider min
-     * - max: maximum bound, defaults to slider max
-     * - change: function called when handle is manipulated
-     */
-    addHandle(data) {
-        let handle = $('<handle>', {
-            id: data.id
-        });
-        // convert starting value to percent, position element, and store percent
-        let percent = this.value_to_percent(data.value);
-        $(handle).data('percent', percent);
-        $(handle).css('left', percent + '%');
-        // set default values
-        let defaults = {
-            'draggable': true,
-            'min': 0,
-            'max': 100,
-            'change': function(){}
-        };
-        for (let attributeName in defaults) {
-            $(handle).data(attributeName, defaults[attributeName]);
-        }
-        // overwrite default values with specified ones where appropriate
-        let skippedAttributes = ['id', 'value'];
-        for (let attributeName in data) {
-            if (skippedAttributes.includes(attributeName)) { continue; }
-            $(handle).data(attributeName, data[attributeName]);
-        }
-        this.container.append(handle);
-        // set input to show starting value
-        $(this.container).find('input').val(data.value);
-        
-        var self = this;
 
-        $(handle).on('mousedown touchstart', function(evt) {
-            // ignore if attempting to grab handle with draggable set to false
-            if (!$(this).data('draggable')) {
+    animate_transition(handle, percent, speed = 500) {
+        var slider = this;
+        // stop current animation if there is one
+        $(handle).stop(true, false);
+        $(handle).animate({
+            left: percent + '%'
+        }, {
+            duration: speed,
+            easing: 'swing',
+            step: function() {
+                // let input = $(slider.container).find('input');
+                // input.val(slider.percent_to_value(percent));
+                $(handle).data('changed')();
+            }
+        });
+    }
+
+    add_handle(desiredID, value, draggable = true, min = 0, max = 100) {
+        let slider = this;
+        let handle = $('#' + desiredID);
+        if (handle.length) { throw new Error('Already element with id ' + desiredID); }
+
+        handle = $('<handle>', { id: desiredID, tabindex: 0 });
+        handle.data('range', { 'min': min, 'max': max });
+        handle.data('changed', function(){});
+        handle.data('dragged', function(){});
+        slider.set_value(value, false, 0, handle);
+        slider.container.prepend(handle);
+
+        if(draggable) {
+            // grab
+            $(handle).on('mousedown touchstart', function(evt) {
+                slider.selectedHandle = this;
+                $(this).addClass('selected');
+                // touch device compatibility
+                if (evt.type === 'touchstart') { evt = evt.touches[0] };
+                // offset relative to where the handle was grabbed
+                slider.grabOffset = evt.pageX - $(this).offset().left - $(this).outerWidth() / 2;
+            });
+            // drag
+            // TODO: could reduce the number of event listeners added to document
+            $(document).on('mousemove touchmove', function(evt) {
+                if (!slider.selectedHandle) { return; }
+                // touch device compatibility
+                if (evt.type === 'touchmove') { evt = evt.touches[0] };
+                // mouse position relative to slider container
+                let x = evt.pageX - slider.container.offset().left;
+                // adjust based on where the handle was grabbed
+                x -= slider.grabOffset;
+                // convert to a percentage to account for UI resizing
+                x = x / slider.container.width() * 100;
+
+                slider.set_percent(x, false, 0, slider.selectedHandle);
+                $(slider.selectedHandle).data('dragged')();
+            });
+            // release
+            $(document).on('mouseup touchend touchcancel', () => {
+                $(slider.selectedHandle).removeClass('selected');
+                slider.selectedHandle = false;
+            });
+        }
+        $(handle).on('keydown', function(evt) {
+            let value = slider.get_value($(this));
+            if (evt.originalEvent.key === 'ArrowRight') {
+                value += slider.step;
+            }
+            else if (evt.originalEvent.key === 'ArrowLeft') {
+                value -= slider.step;
+            }
+            else {
                 return;
             }
-            self.draggedElement = this;
-            // get dragging to work on touch devices
-            if (evt.type === 'touchstart') { evt = evt.touches[0] };
-            // handle offset relative to where it is grabbed
-            self.dragOffset = evt.pageX - $(this).offset().left - ($(this).outerWidth() / 2);
+            slider.set_value(value, false, 0, $(this));
+            $(this).data('dragged')();
         });
-
-        $(document).on('mousemove touchmove', function(evt) {
-            if (self.draggedElement) {
-                // get dragging to work on touch devices
-                if (evt.type === 'touchmove') { evt = evt.touches[0] };
-                // current mouse position relative to the slider parent container
-                let newX = evt.pageX - self.container.offset().left;
-                // handle offset relative to where it is grabbed
-                newX -= self.dragOffset;
-                // clamp handle to be in range min - max, and then within container range (% of container width)
-                newX = self.clamp(newX, self.container.width() * ($(self.draggedElement).data('min') / 100), self.container.width() * ($(self.draggedElement).data('max') / 100));
-                newX = self.clamp(newX, 0, self.container.width());
-                // position as a percentage to account for UI resizing
-                newX = (newX / self.container.width()) * 100;
-
-                $(self.draggedElement).data('percent', newX);
-
-                $(self.draggedElement).css('left', newX + '%');
-                // set input to new value
-                if (self.showInput) {
-                    $(self.draggedElement).parent().find('input').val(self.get_value($(self.draggedElement)));
+        if(slider.showInput) {
+            // typing
+            $(handle).parent().find('input').on('keydown', function(evt) {
+                let input = this;
+                let key = evt.originalEvent.key;
+                if (key === 'ArrowUp' || key === 'ArrowDown') {
+                    evt.preventDefault();
+                    let value = slider.get_input_value(input);
+                    value += key === 'ArrowUp' ? slider.step : -slider.step;
+                    slider.set_value(value, false, 0, handle);
+                    $(handle).data('dragged')();
+                    return;
                 }
-
-                $(self.draggedElement).data('change')();
-            }
-        });
-
-        $(document).on('mouseup touchend touchcancel', function() {
-            self.draggedElement = false;
-        });
-
-        $(handle).parent().find('input').on('keyup', function() {
-            let input = this;
-            clearTimeout(self.timeout);
-            self.timeout = setTimeout(function() {
-                let value = $(input).val();
-                let percent = self.value_to_percent(value);
-                percent = self.clamp(percent, $(handle).data('min'), $(handle).data('max'));
-                // animate handle movement to new value
-                $(handle).animate({
-                    left: percent + '%',
-                }, {
-                    duration: 800,
-                    easing: 'swing',
-                    // updates handle as if it is being dragged
-                    step: function() {
-                        let style = $(handle).attr('style');
-                        const regexLeft = /left: ([\d.]*)%/;
-                        let leftPercent = Number(style.match(regexLeft)[1]);
-                        $(handle).data('percent', leftPercent);
-                        $(handle).data('change')();
-                    }
-                });
-                // TODO: validation
-                $(input).val(self.percent_to_value(percent));
-            }, 400);
-        });
-
-        $(handle).parent().find('input').on('wheel', function() {
-            let value = $(this).val();
-            let percent = self.value_to_percent(value);
-            percent = self.clamp(percent, $(handle).data('min'), $(handle).data('max'))
-            $(handle).data('percent', percent);
-            $(handle).css('left', percent + '%');
-            $(this).val(self.percent_to_value(percent));
-            $(handle).data('change')();
-        });
+                // delays updating the handle until the user hasn't typed for a short while
+                clearTimeout(slider.timeout);
+                self.Timeout = setTimeout(function() {
+                    let value = slider.get_input_value($(input));
+                    slider.set_value(value, true, 500, handle);
+                }, 400);
+            });
+            // mouse wheel
+            $(handle).parent().find('input').on('wheel', function(evt) {
+                evt.preventDefault();
+                let value = Number($(this).val());
+                if (evt.originalEvent.deltaY < 0) {
+                    value += slider.step;
+                }
+                else if (evt.originalEvent.deltaY > 0) {
+                    value -= slider.step;
+                }
+                else {
+                    return;
+                }
+                slider.set_value(value, false, 0, handle);
+                $(handle).data('dragged')();
+            });
+        }
+        if(slider.clickJump) {
+            $(slider.container).find('.bar').on('click tap', function(evt) {
+                // touch device compatibility
+                if (evt.type === 'tap') { evt = evt.touches[0] };
+                // mouse position relative to slider container
+                let x = evt.pageX - slider.container.offset().left;
+                // convert to a percentage to account for UI resizing
+                x = x / slider.container.width() * 100;
+                let handle = slider.get_handle()
+                slider.set_percent(x, true, 300);
+                $(handle).data('dragged')();
+            });
+        }
     }
 }

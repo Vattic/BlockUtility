@@ -53,9 +53,9 @@ var GradientGen = (function() {
         let midColor = previewGradient(0.5);
         let leftColor = previewGradient(0.25)
         let rightColor = previewGradient(0.75)
-        let midStop = $('#handleMid').data('percent') / 100;
-        let leftStop = $('#handleLeft').data('percent') / 100;
-        let rightStop = $('#handleRight').data('percent') / 100;
+        let midStop = stopSlider.get_percent('handleMid') / 100;
+        let leftStop = stopSlider.get_percent('handleLeft') / 100;
+        let rightStop = stopSlider.get_percent('handleRight') / 100;
         
         previewGradient = culori.interpolate([colorA, [leftColor, leftStop], [midColor, midStop], [rightColor, rightStop], colorZ], 'oklch');
         
@@ -196,7 +196,7 @@ var GradientGen = (function() {
     var setup_stop_slider = () => {
 
         var calculate_left = () => {
-            let fromLeft = $('#handleLeft').data('percent') / $('#handleMid').data('percent');
+            let fromLeft = stopSlider.get_percent('handleLeft') / stopSlider.get_percent('handleMid');
             if (isNaN(fromLeft)) {
                 fromLeft = 0;
             }
@@ -204,73 +204,60 @@ var GradientGen = (function() {
         }
 
         var calculate_right = () => {
-            let fromMid = ($('#handleRight').data('percent') - $('#handleMid').data('percent')) / (100 - $('#handleMid').data('percent'));
+            let fromMid = (stopSlider.get_percent('handleRight') - stopSlider.get_percent('handleMid')) / (100 - stopSlider.get_percent('handleMid'));
             if (isNaN(fromMid)) {
                 fromMid = 0;
             }
             return fromMid;
         }
 
-        stopSlider = new Slider('stopSlider');
-        stopSlider.addHandle({
-            id: 'handleStart',
-            value: 0,
-            draggable: false
-        });
-        stopSlider.addHandle({
-            id: 'handleEnd',
-            value: 100,
-            draggable: false
-        });
-        stopSlider.addHandle({
-            id: 'handleLeft',
-            value: 25,
-            change: function() {
-                // stop the left handle from going past the middle handle
-                let handleRadiusPercent = ($('#handleMid').width() / 2) / $(stopSlider.container).width();
-                $('#handleLeft').data('max', $('#handleMid').data('percent') - handleRadiusPercent * 100);
-                // store % distance to middle handle
+        stopSlider = new Slider('stopSlider', 0, 100, 1, false, false);
+
+        stopSlider.add_handle('handleStart', 0, false, 0, 100);
+        stopSlider.add_handle('handleEnd', 100, false, 0, 100);
+
+        stopSlider.add_handle('handleLeft', 25, true, 0, 45);
+        stopSlider.add_handle('handleRight', 75, true, 54, 100);
+        stopSlider.add_handle('handleMid', 50, true, 4, 95);
+
+        stopSlider.set_handle_dragged(function() {
+            // store % distance to middle handle
+            $('#handleLeft').data('fromLeft', calculate_left());
+            update_preview_gradient();
+        }, 'handleLeft');
+
+        stopSlider.set_handle_dragged(function() {
+            // store % distance to middle handle
+            $('#handleRight').data('fromMid', calculate_right());
+
+            update_preview_gradient();
+        }, 'handleRight');
+
+        stopSlider.set_handle_dragged(function() {
+            // stop the left handle from going past the middle handle
+            let handleRadiusPercent = ($('#handleMid').width() / 2) / $(stopSlider.container).width();
+            let newMax = stopSlider.get_percent('handleMid') - handleRadiusPercent * 100;
+            console.log(newMax)
+            stopSlider.set_handle_max(newMax, 'handleLeft');
+            // stop the right handle from going past the middle handle
+            let newMin = stopSlider.get_percent('handleMid') + handleRadiusPercent * 100;
+            console.log(newMin)
+            stopSlider.set_handle_min(newMin, 'handleRight');
+            // store % distance to middle handle if not already stored
+            if (!$('#handleLeft').data('fromLeft')) {
                 $('#handleLeft').data('fromLeft', calculate_left());
-
-                update_preview_gradient();
             }
-        });
-        stopSlider.addHandle({
-            id: 'handleRight',
-            value: 75,
-            change: function() {
-                // stop the right handle from going past the middle handle
-                let handleRadiusPercent = ($('#handleMid').width() / 2) / $(stopSlider.container).width();
-                $('#handleRight').data('min', $('#handleMid').data('percent') + handleRadiusPercent * 100);
-                // store % distance to middle handle
-                let fromMid = ($('#handleRight').data('percent') - $('#handleMid').data('percent')) / (100 - $('#handleMid').data('percent'));
-                $('#handleRight').data('fromMid', fromMid);
-
-                update_preview_gradient();
+            if (!$('#handleRight').data('fromMid')) {
+                $('#handleRight').data('fromMid', calculate_right());
             }
-        });
-        stopSlider.addHandle({
-            id: 'handleMid',
-            value: 50,
-            change: function() {
-                // store % distance to middle handle if not already stored
-                if (!$('#handleLeft').data('fromLeft')) {
-                    $('#handleLeft').data('fromLeft', calculate_left());
-                }
-                if (!$('#handleRight').data('fromMid')) {
-                    $('#handleRight').data('fromMid', calculate_right());
-                }
-                // move the left and right handles to keep their % distance from middle handle constant
-                let percent = $('#handleMid').data('percent') * $('#handleLeft').data('fromLeft');
-                $('#handleLeft').css('left', percent + '%');
-                $('#handleLeft').data('percent', percent);
-                percent = $('#handleMid').data('percent') + $('#handleRight').data('fromMid') * (100 - $('#handleMid').data('percent'));
-                $('#handleRight').css('left', percent + '%');
-                $('#handleRight').data('percent', percent);
+            // move the left and right handles to keep their % distance from middle handle constant
+            let percent = stopSlider.get_percent('handleMid') * $('#handleLeft').data('fromLeft');
+            stopSlider.set_percent(percent, false, 0, 'handleLeft');
+            percent = stopSlider.get_percent('handleMid') + $('#handleRight').data('fromMid') * (100 - stopSlider.get_percent('handleMid'));
+            stopSlider.set_percent(percent, false, 0, 'handleRight');
 
-                update_preview_gradient();
-            }
-        });
+            update_preview_gradient();
+        }, 'handleMid');
     }
 
     var update_color_picker = () => {
@@ -342,24 +329,17 @@ var GradientGen = (function() {
     };
 
     var setup_color_picker = () => {
-        hueSlider = new Slider('hueSlider', 0, 360, 1, true);
-        chromaSlider = new Slider('chromaSlider', 0, 100, 1, true);
-        lightnessSlider = new Slider('lightnessSlider', 0, 100, 1, true);
-        hueSlider.addHandle({
-            id: 'hueHandle',
-            value: 336,
-            change: update_color_picker
-        });
-        chromaSlider.addHandle({
-            id: 'chromaHandle',
-            value: 50,
-            change: update_color_picker
-        });
-        lightnessSlider.addHandle({
-            id: 'lightnessHandle',
-            value: 41,
-            change: update_color_picker
-        });
+        hueSlider = new Slider('hueSlider', 0, 360, 1, true, true);
+        chromaSlider = new Slider('chromaSlider', 0, 100, 1, true, true);
+        lightnessSlider = new Slider('lightnessSlider', 0, 100, 1, true, true);
+
+        hueSlider.add_handle('hueHandle', 336, true, 0, 360);
+        chromaSlider.add_handle('chromaHandle', 50, true, 0, 100);
+        lightnessSlider.add_handle( 'lightnessHandle', 41, true, 0, 100);
+
+        hueSlider.set_handle_changed(update_color_picker);
+        chromaSlider.set_handle_changed(update_color_picker);
+        lightnessSlider.set_handle_changed(update_color_picker);
 
         $(document).on('click', '#handleStart', function() {
             beingPicked = 'colorA';

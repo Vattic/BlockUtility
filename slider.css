@@ -15,8 +15,9 @@
     overflow: visible;
 }
 
-.withInput {
-    margin-right: calc(var(--handleWidth) / 1.8 + var(--inputBuffer));
+.slider.withInput {
+    /* makes space for the input box */
+    margin-right: calc(var(--handleWidth) + var(--inputBuffer));
 }
 
 .slider .bar {
@@ -29,7 +30,11 @@
     background-color: var(--trackColor);
 }
 
-handle {
+.slider.clickJump .bar {
+    cursor: pointer;
+}
+
+.slider handle {
     position: absolute;
     z-index: 4;
     margin-left: calc(var(--handleWidth) / 2 * -1); /* centers the handle */
@@ -48,10 +53,22 @@ handle {
     touch-action: none;
 }
 
+.slider handle:hover {
+    outline: solid 1rem rgba(0, 0, 0, 5%);
+}
+
+.slider handle:focus {
+    outline: solid 1rem rgba(0, 0, 0, 10%);
+}
+
+.slider handle.selected {
+    outline: solid 1rem rgba(0, 0, 0, 15%);
+}
+
 .slider input {
     position: absolute;
     left: calc(100% + var(--handleWidth) / 1.5);
-    width: 3ch;
+    width: var(--inputBuffer);
     align-self: center;
     -webkit-appearance: none;
     -moz-appearance: textfield;
