@@ -19,15 +19,33 @@
 </a> -->
 
 <wrapper>
-    
     <figure id="gradientPreview">
         <!-- <button></button>
         <button></button> -->
     </figure>
     <ul id="gradientControls">
         <li>
-            <input type="hidden" id="colorA" class="colorSelector" autocomplete="off" spellcheck="false">    
+            <button id="pathButton">
+                <img src="./icon/short.svg" alt="toggle path length" id="pathIcon" />
+            </button>
         </li>
+        <li id="stopSlider"></li>
+        <li>
+            <button id="swapButton">
+                <img src="./icon/swap.svg" alt="swap colors" id="swapIcon" />
+            </button>
+        </li>
+    </ul>
+    <div id="colorPicker">
+        <div id="colorPreview"></div>
+        <div id="sliders">
+            <div id="hueSlider"></div>
+            <div id="chromaSlider"></div>
+            <div id="lightnessSlider"></div>
+        </div>
+    </div>
+
+    <!-- <ul id="gradientControls">
         <li id="centerControls">
             <button id="pathButton">
                 <img src="./icon/short.svg" alt="toggle path length" id="pathIcon" />
@@ -39,24 +57,9 @@
                 <img src="./icon/random.svg" alt="randomise colors" id="randomiseIcon" />
             </button>
         </li>
-        <li>
-            <input type="hidden" id="colorZ" class="colorSelector" autocomplete="off" spellcheck="false">
-        </li>
-    </ul>
-    <div id="stopSlider"></div>
-
-    <div id="colorPicker">
-        <div id="colorPreview"></div>
-        <div id="sliders">
-            <div id="hueSlider"></div>
-            <div id="chromaSlider"></div>
-            <div id="lightnessSlider"></div>
-        </div>
-    </div>
+    </ul> -->
     
 </wrapper>
-
-
 
 <div id="texturePicker">
     <h2>Select a texture</h2>

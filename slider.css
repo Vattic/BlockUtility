@@ -19,8 +19,7 @@
     margin-right: calc(var(--handleWidth) / 1.8 + var(--inputBuffer));
 }
 
-.slider::after {
-    content: '';
+.slider .bar {
     display: block;
     z-index: 2;
     margin: auto;
@@ -30,21 +29,9 @@
     background-color: var(--trackColor);
 }
 
-.slider::before {
-    content: '';
-    display: block;
-    position: absolute;
-    z-index: 1;
-    top: 0;
-    left: calc(-1 * (var(--handleWidth) / 2));
-    width: calc(100% + var(--handleWidth));
-    height: 100%;
-    background-color: var(--backgroundColor);
-}
-
 handle {
     position: absolute;
-    z-index: 3;
+    z-index: 4;
     margin-left: calc(var(--handleWidth) / 2 * -1); /* centers the handle */
     box-sizing: border-box;
     -moz-box-sizing: border-box;

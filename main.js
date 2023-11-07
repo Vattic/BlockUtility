@@ -3,21 +3,10 @@ var GradientGen = (function() {
     var root = document.querySelector(':root');
     var blockA;
     var blockZ;
+    var colorA = {mode: 'oklch', l: 1, c: 0.2, h: 20};
+    var colorZ = {mode: 'oklch', l: 0, c: 0.2, h: 144};
 
-    var colorA = {
-        mode: 'oklch',
-        l: 1,
-        c: 0.2,
-        h: 20
-    };
-    var colorZ = {
-        mode: 'oklch',
-        l: 0,
-        c: 0.2,
-        h: 144
-    };
-
-    var textureBeingPicked;
+    var beingPicked = 'colorA';
     var stopSlider;
     var hueSlider;
     var chromaSlider;
@@ -84,6 +73,10 @@ var GradientGen = (function() {
         root.style.setProperty('--midHandleColor', get_rgb_css(midColor));
         root.style.setProperty('--leftHandleColor', get_rgb_css(leftColor));
         root.style.setProperty('--rightHandleColor', get_rgb_css(rightColor));
+        //
+        root.style.setProperty('--colorA', get_rgb_css(colorA));
+        root.style.setProperty('--colorZ', get_rgb_css(colorZ));
+
     }
 
     var random_texture = () => {
@@ -98,14 +91,31 @@ var GradientGen = (function() {
         }
         colorA = {'mode': 'lch', 'l': textureA.averageColor[0], 'c': textureA.averageColor[1], 'h': textureA.averageColor[2]};
         colorZ = {'mode': 'lch', 'l': textureZ.averageColor[0], 'c': textureZ.averageColor[1], 'h': textureZ.averageColor[2]};
-        colorA = culori.converter('oklch')(colorA)
-        colorZ = culori.converter('oklch')(colorZ)
+        colorA = culori.converter('oklch')(colorA);
+        colorZ = culori.converter('oklch')(colorZ);
+        
+        if (beingPicked == 'colorA') {
+            set_color_picker(colorA);
+        }
+        else {
+            set_color_picker(colorZ);
+        }
+
         update_preview_gradient();
     }
 
     var swap = () => {
         [blockA, blockZ] = [blockZ, blockA];
         [colorA, colorZ] = [colorZ, colorA];
+        
+
+        if (beingPicked == 'colorA') {
+            set_color_picker(colorA);
+        }
+        else {
+            set_color_picker(colorZ);
+        }
+
         update_preview_gradient();
     }
 
@@ -203,6 +213,16 @@ var GradientGen = (function() {
 
         stopSlider = new Slider('stopSlider');
         stopSlider.addHandle({
+            id: 'handleStart',
+            value: 0,
+            draggable: false
+        });
+        stopSlider.addHandle({
+            id: 'handleEnd',
+            value: 100,
+            draggable: false
+        });
+        stopSlider.addHandle({
             id: 'handleLeft',
             value: 25,
             change: function() {
@@ -254,10 +274,9 @@ var GradientGen = (function() {
     }
 
     var update_color_picker = () => {
-        let hue = hueSlider.handle_value('hueHandle');
-        let chroma = chromaSlider.handle_value('chromaHandle') / 100 * 0.4;
-        let lightness = lightnessSlider.handle_value('lightnessHandle') / 100 ;
-        
+        let hue = hueSlider.get_value();
+        let chroma = chromaSlider.get_value() / 100 * 0.4;
+        let lightness = lightnessSlider.get_value() / 100 ;
         // hue gradient
         let startColor = color('oklch', lightness, chroma, 0);
         let endColor   = color('oklch', lightness, chroma, 359);
@@ -283,15 +302,15 @@ var GradientGen = (function() {
             // hue gradient
             let intermediate = hueGradient(percent);
             intermediate = get_rgb_css(intermediate);
-            hueGradientCSS += intermediate + ', '
+            hueGradientCSS += intermediate + ', ';
             // chroma gradient
             intermediate = chromaGradient(percent);
             intermediate = get_rgb_css(intermediate);
-            chromaGradientCSS += intermediate + ', '
+            chromaGradientCSS += intermediate + ', ';
             // lightness gradient
             intermediate = lightnessGradient(percent);
             intermediate = get_rgb_css(intermediate);
-            lightnessGradientCSS += intermediate + ', '
+            lightnessGradientCSS += intermediate + ', ';
         }
         hueGradientCSS = hueGradientCSS.slice(0, -2) + ')';
         chromaGradientCSS = chromaGradientCSS.slice(0, -2) + ')';
@@ -304,11 +323,23 @@ var GradientGen = (function() {
         pickedColor = get_rgb_css(pickedColor);
         root.style.setProperty('--pickerColor', pickedColor);
 
-        // TODO: set colorA and colorZ
-        colorA = pickedColor;
+        root.style.setProperty('--' + beingPicked, pickedColor);
+
+        if (beingPicked == 'colorA') {
+            colorA = color('oklch', lightness, chroma, hue);
+        }
+        else {
+            colorZ = color('oklch', lightness, chroma, hue);
+        }
 
         update_preview_gradient();
     }
+
+    var set_color_picker = (color) => {
+        hueSlider.set_value(color.h);
+        chromaSlider.set_value(color.c / 0.4 * 100);
+        lightnessSlider.set_value(color.l * 100);
+    };
 
     var setup_color_picker = () => {
         hueSlider = new Slider('hueSlider', 0, 360, 1, true);
@@ -317,31 +348,35 @@ var GradientGen = (function() {
         hueSlider.addHandle({
             id: 'hueHandle',
             value: 336,
-            change: function() {
-                update_color_picker();
-            }
+            change: update_color_picker
         });
         chromaSlider.addHandle({
             id: 'chromaHandle',
             value: 50,
-            change: function() {
-                update_color_picker();
-            }
+            change: update_color_picker
         });
         lightnessSlider.addHandle({
             id: 'lightnessHandle',
             value: 41,
-            change: function() {
-                update_color_picker();
-            }
+            change: update_color_picker
         });
 
+        $(document).on('click', '#handleStart', function() {
+            beingPicked = 'colorA';
+            set_color_picker(colorA);
+        });
+        $(document).on('click', '#handleEnd', function() {
+            beingPicked = 'colorZ';
+            set_color_picker(colorZ);
+        });
+        
         update_color_picker();
     }
 
     var main = () => {
         setup_stop_slider();
         setup_color_picker();
+        randomise_textures();
 
         $(document).on('click', '#randomiseButton', randomise_textures);
         $(document).on('click', '#swapButton', swap);

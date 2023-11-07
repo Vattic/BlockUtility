@@ -19,10 +19,12 @@ class Slider {
         if (!this.container) { throw new Error('No element found with id ' + elementID); }
 
         this.container.addClass('slider');
-        this.container.addClass('withInput');
+
+        this.container.append($('<div>', { class: 'bar' }));
 
         //add text input to each slider
         if (this.showInput){
+            this.container.addClass('withInput');
             let input = $('<input>', {
                 type: 'number',
                 inputmode: 'decimal',
@@ -37,15 +39,46 @@ class Slider {
 
     clamp = (num, min, max) => Math.min(Math.max(num, min), max);
 
-    /**
-     * Get the value of a given handle
-     * @param {*} handle either a string with html id of handle element, or selected jquery element
-     * @returns {Number}
-     */
-    handle_value(handle) {
+    get_handle() {
+        let handle;
+        if (arguments.length == 0) {
+            handle = $(this.container).find('handle');
+        }
+        else {
+            handle = arguments[0];
+        }
         if (typeof handle === 'string'){
             handle = $('#' + handle);
         }
+        return handle;
+    }
+    /**
+     * 
+     * @param {*} value 
+     * @param args
+     */
+    set_value(value) {
+        let handle;
+        if (!arguments[1]) {
+            handle = this.get_handle();
+        }
+        else {
+            handle = this.get_handle(arguments[1]);
+        }
+        let percent = this.value_to_percent(value);
+        $(handle).data('percent', percent);
+        $(handle).css('left', percent + '%');
+        $(handle).data('change')();
+        $(this.container).find('input').val(Math.round(percent));
+    }
+    /**
+     * Get the value of a given handle
+     * @param {*} handle either nothing for single handle sliders, a string with html id of handle element, selected jquery element
+     * @returns {Number}
+     */
+    get_value() {
+        let handle = this.get_handle.apply(this, arguments);
+
         let handlePercent = $(handle).data('percent');
         let value = this.percent_to_value(handlePercent);
         return value;
@@ -143,7 +176,7 @@ class Slider {
                 $(self.draggedElement).css('left', newX + '%');
                 // set input to new value
                 if (self.showInput) {
-                    $(self.draggedElement).parent().find('input').val(self.handle_value($(self.draggedElement)));
+                    $(self.draggedElement).parent().find('input').val(self.get_value($(self.draggedElement)));
                 }
 
                 $(self.draggedElement).data('change')();

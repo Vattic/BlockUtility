@@ -7,11 +7,12 @@
     --chromaGradient: none;
     --lightnessGradient: none;
     --pickerColor: black;
+    --colorA: black;
+    --colorZ: black;
 
     --standardGray: rgb(60, 60, 60);
     --backgroundBlack: rgb(38, 38, 38);
 }
-
 
 html {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -42,16 +43,21 @@ header {
     padding: 0 1rem;
 }
 
+header h1 {
+    margin: 0.3rem 0 0.8rem;
+}
+
 wrapper {
     display: block;
     background-color: var(--standardGray);
-    padding: 0 1rem 1rem;
+    padding: 0 0.5rem 1rem;
 }
 
 /* gradient preview */
 #gradientPreview {
-    height: 3rem;
+    height: 5rem;
     margin: 0;
+    margin-bottom: 0.8rem;
     border: solid 0.4rem var(--backgroundBlack);
     box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15);
     background-image: var(--previewGradient);
@@ -59,20 +65,22 @@ wrapper {
 
 /* color stop slider */
 #stopSlider {
-    margin-left: 0.35rem !important;
-    margin-right: 0.35rem !important;
+    flex: 1 1 auto;
 }
 
-#stopSlider::after {
+#stopSlider .bar {
     background-image: var(--previewGradient);
 }
 
 .slider handle {
     border-color: white !important;
     box-shadow: inset 0 0 0 0.05rem rgba(0, 0, 0, .15);
+    -webkit-background-clip: padding-box; 
+    -moz-background-clip:    padding; 
+    background-clip:         padding-box;
 }
 
-.slider::after {
+.slider .bar {
     outline: solid 0.35rem var(--backgroundBlack);
     box-shadow: inset 0 0 0 0.05rem rgba(0, 0, 0, .15);
 }
@@ -89,18 +97,41 @@ wrapper {
     background-color: var(--rightHandleColor);
 }
 
-/* color picker */
+#handleStart, #handleEnd {
+    border-color: var(--backgroundBlack) !important;
+    cursor: pointer;
+}
 
+#handleStart {
+    background-color: var(--colorA);
+}
+#handleEnd {
+    background-color: var(--colorZ);
+}
+
+#stopSlider::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: calc(calc(var(--handleHeight) / 2 - 0.5rem / 2));
+    z-index: 5;
+    margin: auto;
+    height: 0.5rem;
+    width: 100%;
+    background-image: var(--previewGradient);
+    pointer-events: none;
+    border-width: 1px 0;
+    border-style: solid;
+    border-image: linear-gradient(90deg, rgba(0,0,0,0) 0.75rem, rgba(0,0,0,15%) 0.75rem, rgba(0,0,0,15%) calc(100% - 0.75rem), rgba(0,0,0,0) calc(100% - 0.75rem)) 1;
+    box-sizing: border-box;
+}
+#stopSlider #handleLeft, #stopSlider #handleRight, #stopSlider #handleMid {
+    z-index: 6 !important;
+}
+
+/* color picker */
 #colorPicker {
     display: flex;
-    z-index: 10;
-    padding-top: 1.4rem;
-    /* width: calc(100% - 2rem);
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 1rem;
-    background-color: var(--standardGray); */
 }
 
 #colorPreview {
@@ -109,6 +140,10 @@ wrapper {
     height: 7.5rem;
     box-sizing: border-box;
     border: solid 0.4rem var(--backgroundBlack);
+    box-shadow: inset 0 0 0 0.05rem rgba(0, 0, 0, .15);
+    -webkit-background-clip: padding-box; 
+    -moz-background-clip:    padding; 
+    background-clip:         padding-box;
 }
 
 #sliders {
@@ -121,15 +156,15 @@ wrapper {
     margin-bottom: 0.4rem;
 }
 
-#hueSlider::after {
+#hueSlider .bar {
     background-image: var(--hueGradient);
 }
 
-#chromaSlider::after {
+#chromaSlider .bar {
     background-image: var(--chromaGradient);
 }
 
-#lightnessSlider::after {
+#lightnessSlider .bar {
     background-image: var(--lightnessGradient);
 }
 
@@ -150,7 +185,7 @@ button {
 }
 
 button > img {
-    height: 2rem;
+    height: 1.8rem;
 }
 
 /* color picker */
@@ -162,7 +197,9 @@ ul#gradientControls {
     margin: 0;
     padding: 0;
     flex-wrap: wrap;
-    padding: 0.5rem 0.4rem 0.9rem;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 0.125rem solid var(--backgroundBlack);
 }
 
 /* gradient controls */
@@ -171,13 +208,22 @@ ul#gradientControls > li {
     height: 2rem;
 }
 
-.minicolors-swatch {
-    height: 2rem !important;
-    width: 2rem !important;
+/* ul#gradientControls li > div {
+    outline: solid 0.4rem var(--backgroundBlack);
+} */
+
+/* ul#gradientControls li > button {
+    justify-self: center;
+} */
+
+#pathButton {
+    margin-right: 0.4rem;
+    width: 1.7rem;
+    height: 1.7rem;
 }
 
-ul#gradientControls li > div {
-    outline: solid 0.4rem var(--backgroundBlack);
+ul#gradientControls button {
+    align-self: center;
 }
 
 #centerControls {
@@ -194,7 +240,6 @@ ul#gradientControls li > div {
 figure > button:hover {
     outline: solid 0.3rem white;
 } */
-
 
 /* texture picker */
 #texturePicker {
