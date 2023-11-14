@@ -9,8 +9,10 @@
     --pickerColor: black;
     --colorA: black;
     --colorZ: black;
+    --arrowOffset: 0% + 34px;
 
     --standardGray: rgb(60, 60, 60);
+    --lighterGray: rgb(85, 85, 85);
     --backgroundBlack: rgb(38, 38, 38);
 }
 
@@ -29,7 +31,14 @@ input {
     letter-spacing: inherit;
     color: inherit;
     background-color: var(--backgroundBlack) !important;
+    border-radius: 0.2rem;
     border: none;
+    outline: solid 0.15rem transparent;
+    transition: outline 0.3s;
+}
+
+input:hover, input:focus {
+    outline: solid 0.15rem white;
 }
 
 body {
@@ -59,7 +68,7 @@ wrapper {
     margin: 0;
     margin-bottom: 0.8rem;
     border: solid 0.4rem var(--backgroundBlack);
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15);
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
     background-image: var(--previewGradient);
 }
 
@@ -135,6 +144,24 @@ wrapper {
 /* color picker */
 #colorPicker {
     display: flex;
+    position: relative;
+    background-color: var(--lighterGray);
+    padding: 1rem;
+    filter: drop-shadow(0 0.3rem 0.5rem #333);
+}
+
+#colorPicker::before {
+    content: "";
+    position: absolute;
+    top: calc(0% - 1rem);
+    left: calc(var(--arrowOffset));
+    width: 2rem;
+    height: 2rem;
+    transform: rotate(45deg);
+    background-color:inherit;
+    z-index: -1;
+    transition: left 0.1s;
+
 }
 
 #colorPreview {
@@ -151,7 +178,6 @@ wrapper {
 
 #sliders {
     flex: 1 1 auto;
-    padding-right: 2ch;
 }
 
 #colorPicker .slider {
@@ -191,7 +217,6 @@ button > img {
     height: 1.8rem;
 }
 
-/* color picker */
 ul#gradientControls {
     list-style: none;
     display: flex;
@@ -202,7 +227,6 @@ ul#gradientControls {
     flex-wrap: wrap;
     padding-bottom: 1rem;
     margin-bottom: 1rem;
-    border-bottom: 0.125rem solid var(--backgroundBlack);
 }
 
 /* gradient controls */

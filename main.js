@@ -213,20 +213,31 @@ var GradientGen = (function() {
 
         stopSlider = new Slider('stopSlider', 0, 100, 1, false, false);
 
-        stopSlider.add_handle('handleStart', 0, false, 0, 100);
         stopSlider.add_handle('handleEnd', 100, false, 0, 100);
-
-        stopSlider.add_handle('handleLeft', 25, true, 0, 45);
-        stopSlider.add_handle('handleRight', 75, true, 54, 100);
-        stopSlider.add_handle('handleMid', 50, true, 4, 95);
+        stopSlider.add_handle('handleRight', 75, true, 0, 100);
+        stopSlider.add_handle('handleMid', 50, true, 0, 100);
+        stopSlider.add_handle('handleLeft', 25, true, 0, 100);
+        stopSlider.add_handle('handleStart', 0, false, 0, 100);
 
         stopSlider.set_handle_dragged(function() {
+            // stop the left handle from going past the middle handle + some buffer space
+            // TODO: currently calculates every time to account for possible window / element resizing, could listen for that separately
+            // the issue is that I want the buffer space to be half the width of the handle, but min and max are taken as slider values not % along bar or pixels on screen
+            // setting it to a fixed value means the buffer grows and shrinks based on the width of the container
+            let handleRadiusPercent = ($('#handleEnd').width() / 2) / $(stopSlider.container).width();
+            let newMax = stopSlider.get_percent('handleMid') - handleRadiusPercent * 100;
+            stopSlider.set_handle_max(newMax, 'handleLeft');
             // store % distance to middle handle
             $('#handleLeft').data('fromLeft', calculate_left());
             update_preview_gradient();
         }, 'handleLeft');
 
         stopSlider.set_handle_dragged(function() {
+            // stop the right handle from going past the middle handle + some buffer space
+            // TODO: currently calculates every time to account for possible window / element resizing, could listen for that separately
+            let handleRadiusPercent = ($('#handleEnd').width() / 2) / $(stopSlider.container).width();
+            let newMin = stopSlider.get_percent('handleMid') + handleRadiusPercent * 100;
+            stopSlider.set_handle_min(newMin, 'handleRight');
             // store % distance to middle handle
             $('#handleRight').data('fromMid', calculate_right());
 
@@ -234,15 +245,13 @@ var GradientGen = (function() {
         }, 'handleRight');
 
         stopSlider.set_handle_dragged(function() {
-            // stop the left handle from going past the middle handle
-            let handleRadiusPercent = ($('#handleMid').width() / 2) / $(stopSlider.container).width();
-            let newMax = stopSlider.get_percent('handleMid') - handleRadiusPercent * 100;
-            console.log(newMax)
-            stopSlider.set_handle_max(newMax, 'handleLeft');
-            // stop the right handle from going past the middle handle
-            let newMin = stopSlider.get_percent('handleMid') + handleRadiusPercent * 100;
-            console.log(newMin)
-            stopSlider.set_handle_min(newMin, 'handleRight');
+            // stop the middle handle from going past the edges of the slider + some buffer space
+            // TODO: currently calculates every time to account for possible window / element resizing, could listen for that separately
+            let handleRadiusPercent = ($('#handleEnd').width() / 2) / $(stopSlider.container).width();
+            let newMin = handleRadiusPercent * 100;
+            let newMax = 100 - handleRadiusPercent * 100;
+            stopSlider.set_handle_min(newMin, 'handleMid');
+            stopSlider.set_handle_max(newMax, 'handleMid');
             // store % distance to middle handle if not already stored
             if (!$('#handleLeft').data('fromLeft')) {
                 $('#handleLeft').data('fromLeft', calculate_left());
@@ -344,11 +353,18 @@ var GradientGen = (function() {
         $(document).on('click', '#handleStart', function() {
             beingPicked = 'colorA';
             set_color_picker(colorA);
+            $('#handleEnd').removeClass('selectedColor');
+            $('#handleStart').addClass('selectedColor');
+            root.style.setProperty('--arrowOffset', '0% + 34px');
         });
         $(document).on('click', '#handleEnd', function() {
             beingPicked = 'colorZ';
             set_color_picker(colorZ);
+            $('#handleStart').removeClass('selectedColor');
+            $('#handleEnd').addClass('selectedColor');
+            root.style.setProperty('--arrowOffset', '100% - 64px');
         });
+        // TODO: let space and return "click" the focused handleStart / handleEnd (tabbed to)
         
         update_color_picker();
     }

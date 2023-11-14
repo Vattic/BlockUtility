@@ -35,6 +35,7 @@ class Slider {
         if (clickJump) {
             this.container.addClass('clickJump');
         }
+        this.add_extra_controls();
     }
 
     clamp = (num, min, max) => Math.min(Math.max(num, min), max);
@@ -43,6 +44,87 @@ class Slider {
         numToRoundTo = 1 / (numToRoundTo);
     
         return Math.round(numToRound * numToRoundTo) / numToRoundTo;
+    }
+
+    add_extra_controls() {
+        let slider = this;
+        $(slider.container).on('wheel', function(evt) {
+            // mouse wheel when input is focused
+            if ($(slider.container).find('input:focus').length) {
+                evt.preventDefault();
+                let input = $(slider.container).find('input:focus');
+                let value = Number($(input).val());
+                if (evt.originalEvent.deltaY < 0) {
+                    value += slider.step;
+                }
+                else if (evt.originalEvent.deltaY > 0) {
+                    value -= slider.step;
+                }
+                else {
+                    return;
+                }
+                let handle = slider.get_handle();
+                slider.set_value(value, false, 0, handle);
+                $(handle).data('dragged')();
+            }
+            // mouse wheel when handle is focused
+            else if ($(slider.container).find('handle:focus').length) {
+                let handle = $(slider.container).find('handle:focus');
+                if (!handle.data('draggable')) {
+                    return;
+                }
+                
+                evt.preventDefault();
+                
+                let percent = slider.get_percent(handle);
+                if (evt.originalEvent.deltaY < 0) {
+                    percent += slider.step;
+                }
+                else if (evt.originalEvent.deltaY > 0) {
+                    percent -= slider.step;
+                }
+                else {
+                    return;
+                }
+                slider.set_percent(percent, false, 0, handle);
+                $(handle).data('dragged')();
+            }
+        });
+        if(slider.showInput) {
+            // typing
+            $(slider.container).find('input').on('keydown', function(evt) {
+                let input = this;
+                let handle = slider.get_handle();
+                let key = evt.originalEvent.key;
+                if (key === 'ArrowUp' || key === 'ArrowDown') {
+                    evt.preventDefault();
+                    let value = slider.get_input_value(input);
+                    value += key === 'ArrowUp' ? slider.step : -slider.step;
+                    slider.set_value(value, false, 0, handle);
+                    $(handle).data('dragged')();
+                    return;
+                }
+                // delays updating the handle until the user hasn't typed for a short while
+                clearTimeout(slider.timeout);
+                self.Timeout = setTimeout(function() {
+                    let value = slider.get_input_value($(input));
+                    slider.set_value(value, true, 500, handle);
+                }, 400);
+            });
+        }
+        if(slider.clickJump) {
+            $(slider.container).find('.bar').on('click tap', function(evt) {
+                // touch device compatibility
+                if (evt.type === 'tap') { evt = evt.touches[0] };
+                // mouse position relative to slider container
+                let x = evt.pageX - slider.container.offset().left;
+                // convert to a percentage to account for UI resizing
+                x = x / slider.container.width() * 100;
+                let handle = slider.get_handle()
+                slider.set_percent(x, true, 300, handle);
+                $(handle).data('dragged')();
+            });
+        }
     }
 
     get_handle(handleID = undefined) {
@@ -112,7 +194,9 @@ class Slider {
 
     get_percent(handle = undefined) {
         handle = this.get_handle(handle);
-        let percent = handle.position().left / this.container.width() * 100;
+        let style = $(handle).attr('style');
+        const regexLeft = /left: ([\d.-]*)%/;
+        let percent = Number(style.match(regexLeft)[1]);
         return percent;
     }
 
@@ -201,7 +285,9 @@ class Slider {
         slider.set_value(value, false, 0, handle);
         slider.container.prepend(handle);
 
+        
         if(draggable) {
+            handle.data('draggable', true);
             // grab
             $(handle).on('mousedown touchstart', function(evt) {
                 slider.selectedHandle = this;
@@ -232,69 +318,21 @@ class Slider {
                 $(slider.selectedHandle).removeClass('selected');
                 slider.selectedHandle = false;
             });
-        }
-        $(handle).on('keydown', function(evt) {
-            let value = slider.get_value($(this));
-            if (evt.originalEvent.key === 'ArrowRight') {
-                value += slider.step;
-            }
-            else if (evt.originalEvent.key === 'ArrowLeft') {
-                value -= slider.step;
-            }
-            else {
-                return;
-            }
-            slider.set_value(value, false, 0, $(this));
-            $(this).data('dragged')();
-        });
-        if(slider.showInput) {
-            // typing
-            $(handle).parent().find('input').on('keydown', function(evt) {
-                let input = this;
-                let key = evt.originalEvent.key;
-                if (key === 'ArrowUp' || key === 'ArrowDown') {
-                    evt.preventDefault();
-                    let value = slider.get_input_value(input);
-                    value += key === 'ArrowUp' ? slider.step : -slider.step;
-                    slider.set_value(value, false, 0, handle);
-                    $(handle).data('dragged')();
-                    return;
+            $(handle).on('keydown', function(evt) {
+                let value = slider.get_value($(this));
+                if (evt.originalEvent.key === 'ArrowRight' || evt.originalEvent.key === 'ArrowUp' || evt.originalEvent.key === 'PageUp') {
+                    let multi = evt.originalEvent.key === 'PageUp' ? 10 : 1;
+                    value += slider.step * multi;
                 }
-                // delays updating the handle until the user hasn't typed for a short while
-                clearTimeout(slider.timeout);
-                self.Timeout = setTimeout(function() {
-                    let value = slider.get_input_value($(input));
-                    slider.set_value(value, true, 500, handle);
-                }, 400);
-            });
-            // mouse wheel
-            $(handle).parent().find('input').on('wheel', function(evt) {
-                evt.preventDefault();
-                let value = Number($(this).val());
-                if (evt.originalEvent.deltaY < 0) {
-                    value += slider.step;
-                }
-                else if (evt.originalEvent.deltaY > 0) {
-                    value -= slider.step;
+                else if (evt.originalEvent.key === 'ArrowLeft' || evt.originalEvent.key === 'ArrowDown' || evt.originalEvent.key === 'PageDown') {
+                    let multi = evt.originalEvent.key === 'PageDown' ? 10 : 1;
+                    value -= slider.step * multi;
                 }
                 else {
                     return;
                 }
-                slider.set_value(value, false, 0, handle);
-                $(handle).data('dragged')();
-            });
-        }
-        if(slider.clickJump) {
-            $(slider.container).find('.bar').on('click tap', function(evt) {
-                // touch device compatibility
-                if (evt.type === 'tap') { evt = evt.touches[0] };
-                // mouse position relative to slider container
-                let x = evt.pageX - slider.container.offset().left;
-                // convert to a percentage to account for UI resizing
-                x = x / slider.container.width() * 100;
-                let handle = slider.get_handle()
-                slider.set_percent(x, true, 300);
-                $(handle).data('dragged')();
+                slider.set_value(value, false, 0, $(this));
+                $(this).data('dragged')();
             });
         }
     }
