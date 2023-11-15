@@ -9,7 +9,7 @@
     --pickerColor: black;
     --colorA: black;
     --colorZ: black;
-    --arrowOffset: 0% + 34px;
+    --arrowOffset: 0% + 2.1rem;
 
     --standardGray: rgb(60, 60, 60);
     --lighterGray: rgb(85, 85, 85);
@@ -139,6 +139,10 @@ wrapper {
 }
 #stopSlider #handleMid {
     z-index: 7 !important;
+}
+
+#handleStart.selectedColor::after #handleEnd.selectedColor::after {
+    display: none;
 }
 
 /* color picker */
