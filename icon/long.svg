@@ -2,43 +2,182 @@
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
 <svg
-   width="910.59338"
-   height="881.17676"
-   viewBox="0 0 240.92783 233.14468"
+   width="32"
+   height="32"
+   viewBox="0 0 32 32"
    version="1.1"
    id="svg1"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   sodipodi:docname="long.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="px"
+     showgrid="true"
+     inkscape:zoom="14.15625"
+     inkscape:cx="9.3598234"
+     inkscape:cy="17.589404"
+     inkscape:window-width="1680"
+     inkscape:window-height="966"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g13">
+    <inkscape:grid
+       id="grid1"
+       units="px"
+       originx="16"
+       originy="16"
+       spacingx="1"
+       spacingy="1"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       dotted="false"
+       gridanglex="30"
+       gridanglez="30"
+       visible="true" />
+  </sodipodi:namedview>
   <defs
      id="defs1">
+    <marker
+       style="overflow:visible"
+       id="marker11"
+       refX="0"
+       refY="0"
+       orient="auto"
+       inkscape:stockid="Dot"
+       markerWidth="1.3"
+       markerHeight="1.3"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid"
+       markerUnits="userSpaceOnUse">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:none"
+         d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
+         sodipodi:nodetypes="sssss"
+         id="path11" />
+    </marker>
     <marker
        style="overflow:visible"
        id="Dot"
        refX="0"
        refY="0"
        orient="auto"
-       markerWidth="0.34999999"
-       markerHeight="0.34999999"
+       inkscape:stockid="Dot"
+       markerWidth="1.3"
+       markerHeight="1.3"
        viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
        preserveAspectRatio="xMidYMid"
-       markerUnits="strokeWidth">
+       markerUnits="userSpaceOnUse">
       <path
          transform="scale(0.5)"
          style="fill:context-stroke;fill-rule:evenodd;stroke:none"
          d="M 5,0 C 5,2.76 2.76,5 0,5 -2.76,5 -5,2.76 -5,0 c 0,-2.76 2.3,-5 5,-5 2.76,0 5,2.24 5,5 z"
+         sodipodi:nodetypes="sssss"
          id="path17" />
+    </marker>
+    <marker
+       style="overflow:visible"
+       id="Triangle"
+       refX="0"
+       refY="-0.2"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1.3"
+       markerHeight="1.3"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid"
+       markerUnits="userSpaceOnUse">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135" />
     </marker>
   </defs>
   <g
+     inkscape:label="Original"
+     inkscape:groupmode="layer"
      id="layer1"
-     transform="translate(-17.215599,-24.985537)">
+     style="display:none">
+    <circle
+       style="display:inline;fill:none;stroke:#ffffff;stroke-width:3.5;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:151.181;paint-order:fill markers stroke"
+       id="path6"
+       cx="16"
+       cy="16"
+       r="12.002604" />
+    <circle
+       style="display:none;fill:#ff0000;stroke:none;stroke-width:2;stroke-linejoin:round;stroke-dashoffset:151.181;paint-order:fill markers stroke"
+       id="circle2"
+       cx="16"
+       cy="16"
+       r="20.291416"
+       inkscape:label="circle large" />
+  </g>
+  <g
+     inkscape:label="length - long"
+     inkscape:groupmode="layer"
+     id="g10"
+     style="display:inline">
     <path
-       style="display:inline;fill:none;stroke:#a6a6a6;stroke-width:26.4583;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Dot);marker-end:url(#Dot)"
-       d="m 176.24175,48.140111 c 21.56902,6.693746 40.36573,21.910127 51.40385,41.61263 11.81725,21.093219 14.53759,47.087549 7.3434,70.170329"
-       id="path14" />
+       id="circle9"
+       style="display:inline;fill:none;stroke:#b3b3b3;stroke-width:3.5;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:151.181;marker-start:url(#marker11);marker-end:url(#Dot);paint-order:fill markers stroke"
+       d="M 17.857381,4.1419805 A 12.002604,12.002604 0 0 1 28.002604,16 v 0 a 12.002604,12.002604 0 0 1 -0.218284,2.278661"
+       inkscape:label="short" />
     <path
-       style="display:inline;fill:none;stroke:#ffffff;stroke-width:26.4583;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#Dot);marker-end:url(#Dot)"
-       d="M 176.24175,48.140111 C 146.19123,34.446391 109.50739,36.393433 81.075249,53.191194 52.643103,69.988956 33.236737,101.1801 30.730569,134.10837 c -2.506167,32.92827 11.956095,66.69716 37.518513,87.60444 25.562417,20.90728 61.529028,28.38374 93.305858,19.3957 18.50795,-5.23496 35.48361,-15.77332 48.38612,-30.03777 12.90251,-14.26444 21.69026,-32.20895 25.04794,-51.14767"
-       id="path13" />
+       id="path10"
+       style="display:inline;fill:none;stroke:#ffffff;stroke-width:3.5;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:151.181;marker-start:url(#marker11);marker-end:url(#Dot);paint-order:fill markers stroke"
+       d="M 27.78432,18.278661 A 12.002604,12.002604 0 0 1 16,28.002604 12.002604,12.002604 0 0 1 3.9973965,16 12.002604,12.002604 0 0 1 16,3.9973965 a 12.002604,12.002604 0 0 1 1.857381,0.144584"
+       inkscape:label="long" />
+  </g>
+  <g
+     inkscape:label="length - short"
+     inkscape:groupmode="layer"
+     id="g13"
+     style="display:none">
+    <path
+       id="path13"
+       style="display:inline;fill:none;stroke:#b3b3b3;stroke-width:3.5;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:151.181;marker-start:url(#marker11);marker-end:url(#Dot);paint-order:fill markers stroke"
+       d="M 27.78432,18.278661 A 12.002604,12.002604 0 0 1 16,28.002604 12.002604,12.002604 0 0 1 3.9973965,16 12.002604,12.002604 0 0 1 16,3.9973965 a 12.002604,12.002604 0 0 1 1.857381,0.144584"
+       inkscape:label="long" />
+    <path
+       id="path12"
+       style="display:inline;fill:none;stroke:#ffffff;stroke-width:3.5;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:151.181;marker-start:url(#marker11);marker-end:url(#Dot);paint-order:fill markers stroke"
+       d="M 17.857381,4.1419805 A 12.002604,12.002604 0 0 1 28.002604,16 v 0 a 12.002604,12.002604 0 0 1 -0.218284,2.278661"
+       inkscape:label="short" />
+  </g>
+  <g
+     inkscape:label="swap"
+     inkscape:groupmode="layer"
+     id="g7"
+     style="display:none">
+    <path
+       id="path9"
+       style="display:inline;fill:none;stroke:#ffffff;stroke-width:3.5;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:151.181;marker-end:url(#Triangle);paint-order:fill markers stroke"
+       d="M 6.1583397,9.1294677 A 12.002604,12.002604 0 0 1 16,3.9973965 12.002604,12.002604 0 0 1 28.002604,16" />
+    <path
+       id="path7"
+       style="display:inline;fill:none;stroke:#ffffff;stroke-width:3.5;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:151.181;marker-end:url(#Triangle);paint-order:fill markers stroke"
+       d="M 25.84166,22.870532 A 12.002604,12.002604 0 0 1 16,28.002604 12.002604,12.002604 0 0 1 3.9973965,16" />
   </g>
 </svg>

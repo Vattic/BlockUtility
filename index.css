@@ -9,7 +9,7 @@
     --pickerColor: black;
     --colorA: black;
     --colorZ: black;
-    --arrowOffset: 0% + 2.1rem;
+    --arrowOffset: 2.05rem;
 
     --standardGray: rgb(60, 60, 60);
     --lighterGray: rgb(85, 85, 85);
@@ -106,16 +106,16 @@ wrapper {
     background-color: var(--rightHandleColor);
 }
 
-#handleStart, #handleEnd {
-    border-color: var(--backgroundBlack) !important;
-    cursor: pointer;
-}
-
 #handleStart {
     background-color: var(--colorA);
 }
 #handleEnd {
     background-color: var(--colorZ);
+}
+
+#handleStart, #handleEnd {
+    border-color: var(--backgroundBlack) !important;
+    cursor: pointer;
 }
 
 #stopSlider::before {
@@ -141,10 +141,6 @@ wrapper {
     z-index: 7 !important;
 }
 
-#handleStart.selectedColor::after #handleEnd.selectedColor::after {
-    display: none;
-}
-
 /* color picker */
 #colorPicker {
     display: flex;
@@ -154,6 +150,7 @@ wrapper {
     filter: drop-shadow(0 0.3rem 0.5rem #333);
 }
 
+/* arrow pointing to selected color */
 #colorPicker::before {
     content: "";
     position: absolute;
@@ -165,7 +162,6 @@ wrapper {
     background-color:inherit;
     z-index: -1;
     transition: left 0.1s;
-
 }
 
 #colorPreview {
@@ -215,10 +211,12 @@ button {
     border: none;
     padding: 0;
     margin: 0;
+    width: 2rem;
+    height: 2rem;
 }
 
 button > img {
-    height: 1.8rem;
+    height: 2rem;
 }
 
 ul#gradientControls {
@@ -239,22 +237,8 @@ ul#gradientControls > li {
     height: 2rem;
 }
 
-/* ul#gradientControls li > div {
-    outline: solid 0.4rem var(--backgroundBlack);
-} */
-
-/* ul#gradientControls li > button {
-    justify-self: center;
-} */
-
-#pathButton {
-    margin-right: 0.4rem;
-    width: 1.7rem;
-    height: 1.7rem;
-}
-
-ul#gradientControls button {
-    align-self: center;
+#pathButton > img, #swapButton > img {
+    filter: drop-shadow(0.2rem 0.2rem 0.2rem var(--backgroundBlack));
 }
 
 #centerControls {

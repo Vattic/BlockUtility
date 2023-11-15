@@ -1,5 +1,109 @@
-<?xml version="1.0" encoding="utf-8"?><!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
-<svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M21 7.5L8 7.5M21 7.5L16.6667 3M21 7.5L16.6667 12" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M4 16.5L17 16.5M4 16.5L8.33333 21M4 16.5L8.33333 12" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="32"
+   height="32"
+   viewBox="0 0 32 32"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   sodipodi:docname="swap.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="px"
+     showgrid="true"
+     inkscape:zoom="14.15625"
+     inkscape:cx="3.7086093"
+     inkscape:cy="11.93819"
+     inkscape:window-width="1680"
+     inkscape:window-height="966"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g7">
+    <inkscape:grid
+       id="grid1"
+       units="px"
+       originx="16"
+       originy="16"
+       spacingx="1"
+       spacingy="1"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       dotted="false"
+       gridanglex="30"
+       gridanglez="30"
+       visible="true" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1">
+    <marker
+       style="overflow:visible"
+       id="Triangle"
+       refX="0"
+       refY="-0.2"
+       orient="auto-start-reverse"
+       inkscape:stockid="Triangle arrow"
+       markerWidth="1.3"
+       markerHeight="1.3"
+       viewBox="0 0 1 1"
+       inkscape:isstock="true"
+       inkscape:collect="always"
+       preserveAspectRatio="xMidYMid"
+       markerUnits="userSpaceOnUse">
+      <path
+         transform="scale(0.5)"
+         style="fill:context-stroke;fill-rule:evenodd;stroke:context-stroke;stroke-width:1pt"
+         d="M 5.77,0 -2.88,5 V -5 Z"
+         id="path135" />
+    </marker>
+  </defs>
+  <g
+     inkscape:label="Original"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:none">
+    <circle
+       style="display:inline;fill:none;stroke:#ffffff;stroke-width:3.5;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:151.181;paint-order:fill markers stroke"
+       id="path6"
+       cx="16"
+       cy="16"
+       r="12.002604" />
+    <circle
+       style="display:none;fill:#ff0000;stroke:none;stroke-width:2;stroke-linejoin:round;stroke-dashoffset:151.181;paint-order:fill markers stroke"
+       id="circle2"
+       cx="16"
+       cy="16"
+       r="20.291416"
+       inkscape:label="circle large" />
+  </g>
+  <g
+     inkscape:label="Original copy"
+     inkscape:groupmode="layer"
+     id="g7"
+     style="display:inline">
+    <path
+       id="path9"
+       style="display:inline;fill:none;stroke:#ffffff;stroke-width:3.5;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:151.181;paint-order:fill markers stroke;marker-end:url(#Triangle)"
+       d="M 6.1583397 9.1294677 A 12.002604 12.002604 0 0 1 16 3.9973965 A 12.002604 12.002604 0 0 1 28.002604 16 " />
+    <path
+       id="path7"
+       style="display:inline;fill:none;stroke:#ffffff;stroke-width:3.5;stroke-linejoin:round;stroke-dasharray:none;stroke-dashoffset:151.181;paint-order:fill markers stroke;marker-end:url(#Triangle)"
+       d="M 25.84166 22.870532 A 12.002604 12.002604 0 0 1 16 28.002604 A 12.002604 12.002604 0 0 1 3.9973965 16 " />
+  </g>
 </svg>

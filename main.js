@@ -355,14 +355,14 @@ var GradientGen = (function() {
             set_color_picker(colorA);
             $('#handleEnd').removeClass('selectedColor');
             $('#handleStart').addClass('selectedColor');
-            root.style.setProperty('--arrowOffset', '0% + 2.1rem');
+            root.style.setProperty('--arrowOffset', '2.05rem');
         });
         $(document).on('click', '#handleEnd', function() {
             beingPicked = 'colorZ';
             set_color_picker(colorZ);
             $('#handleStart').removeClass('selectedColor');
             $('#handleEnd').addClass('selectedColor');
-            root.style.setProperty('--arrowOffset', '100% - 4rem');
+            root.style.setProperty('--arrowOffset', '100% - 4.15rem');
         });
         // TODO: let space and return "click" the focused handleStart / handleEnd (tabbed to)
         
