@@ -51,12 +51,15 @@ var GradientGen = (function() {
             }
         });
         let midColor = previewGradient(0.5);
-        let leftColor = previewGradient(0.25)
-        let rightColor = previewGradient(0.75)
+        let leftColor = previewGradient(0.25);
+        let rightColor = previewGradient(0.75);
+        midColor = culori.toGamut('rgb')(midColor);
+        leftColor = culori.toGamut('rgb')(leftColor);
+        rightColor = culori.toGamut('rgb')(rightColor);
         let midStop = stopSlider.get_percent('handleMid') / 100;
         let leftStop = stopSlider.get_percent('handleLeft') / 100;
         let rightStop = stopSlider.get_percent('handleRight') / 100;
-        
+
         previewGradient = culori.interpolate([colorA, [leftColor, leftStop], [midColor, midStop], [rightColor, rightStop], colorZ], 'oklch');
         
         let steps = 50;
@@ -107,7 +110,6 @@ var GradientGen = (function() {
     var swap = () => {
         [blockA, blockZ] = [blockZ, blockA];
         [colorA, colorZ] = [colorZ, colorA];
-        
 
         if (beingPicked == 'colorA') {
             set_color_picker(colorA);
@@ -272,7 +274,7 @@ var GradientGen = (function() {
     var update_color_picker = () => {
         let hue = hueSlider.get_value();
         let chroma = chromaSlider.get_value() / 100 * 0.4;
-        let lightness = lightnessSlider.get_value() / 100 ;
+        let lightness = lightnessSlider.get_value() / 100;
         // hue gradient
         let startColor = color('oklch', lightness, chroma, 0);
         let endColor   = color('oklch', lightness, chroma, 359);
@@ -316,16 +318,18 @@ var GradientGen = (function() {
         root.style.setProperty('--lightnessGradient', lightnessGradientCSS);
         // set handle color
         let pickedColor = color('oklch', lightness, chroma, hue);
-        pickedColor = get_rgb_css(pickedColor);
-        root.style.setProperty('--pickerColor', pickedColor);
-
-        root.style.setProperty('--' + beingPicked, pickedColor);
+        console.log('picked', pickedColor)
+        pickedColor = culori.toGamut('rgb')(pickedColor);
+        pickedColor = culori.converter('oklch')(pickedColor);
+        console.log('picked', pickedColor);
+        let pickedColorCSS = get_rgb_css(pickedColor);
+        root.style.setProperty('--pickerColor', pickedColorCSS);
 
         if (beingPicked == 'colorA') {
-            colorA = color('oklch', lightness, chroma, hue);
+            colorA = pickedColor;
         }
         else {
-            colorZ = color('oklch', lightness, chroma, hue);
+            colorZ = pickedColor;
         }
 
         update_preview_gradient();
@@ -341,10 +345,10 @@ var GradientGen = (function() {
         hueSlider = new Slider('hueSlider', 0, 360, 1, true, true);
         chromaSlider = new Slider('chromaSlider', 0, 100, 1, true, true);
         lightnessSlider = new Slider('lightnessSlider', 0, 100, 1, true, true);
-
-        hueSlider.add_handle('hueHandle', 336, true, 0, 360);
-        chromaSlider.add_handle('chromaHandle', 50, true, 0, 100);
-        lightnessSlider.add_handle( 'lightnessHandle', 41, true, 0, 100);
+        colorA = culori.converter('oklch')(colorA);
+        hueSlider.add_handle('hueHandle', colorA.h, true, 0, 360);
+        chromaSlider.add_handle('chromaHandle', colorA.c / 0.4 * 100, true, 0, 100);
+        lightnessSlider.add_handle( 'lightnessHandle', colorA.l * 100, true, 0, 100);
 
         hueSlider.set_handle_changed(update_color_picker);
         chromaSlider.set_handle_changed(update_color_picker);
@@ -379,7 +383,7 @@ var GradientGen = (function() {
         $(document).on('click', '#pathButton', toggle_path_length);
         setup_texture_menu();
 
-        update_preview_gradient(); 
+        update_preview_gradient();
     }
 
     $(document).ready(function() {
